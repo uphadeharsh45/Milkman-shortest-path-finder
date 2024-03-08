@@ -9,10 +9,12 @@ const Map = () => {
     libraries: libraries
   })
 
+  const [places, setPlaces] = useState([]);
   const [map, setmap] = useState(/** @type google.maps.Map */(null))
   const [searchPosition, setSearchPosition] = useState(null);
-  const[temp,settemp]=useState({lat: "", lng: "",name : "",time : ""})
+  const[temp,settemp]=useState({name : "",lat: "", lng: "",time : ""})
   const autocompleteRef = useRef(null);
+  const [clickedLatLng, setClickedLatLng] = useState(null);
 
 
   const handleAutocompleteLoad = (autocomplete) => {
@@ -54,7 +56,6 @@ const Map = () => {
     setmap(map);
   };
 
-  const [clickedLatLng, setClickedLatLng] = useState(null);
 
   const mapClicked = (clickEvent) => {
     const newLatLng = {
@@ -74,7 +75,17 @@ const Map = () => {
   const handleadd = () => {
     // Perform validation if needed
     console.log(temp); // Here you have access to the complete temp object with all values
-  };
+    setPlaces(prevPlaces => {
+      const newPlaces = [...prevPlaces, temp];
+      // console.log("New places:", newPlaces);
+      return newPlaces;
+    });
+    // console.log(places) // Add temp to the places array
+  };  
+  useEffect(() => {
+    // console.log(clickedLatLng);
+    console.log(places);
+  }, [places]);
 
   if (!isLoaded) {
     return (<div>Map not Loaded</div>)
@@ -144,7 +155,8 @@ const Map = () => {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="message-text" className="col-form-label">Time:</label><br />
-                  <input type="time" name="add_time" id="add_time" onChange={(e) => settemp({ ...temp, time: e.target.value })} value={temp.time} style={{
+                  <input type="time" name="add_time" id="add_time" onChange={(e) => settemp({ ...temp, time: e.target.value })} value={temp.time} 
+                  style={{
     padding: '6px 7px',
     fontSize: '15px',
     margin: '0px',
