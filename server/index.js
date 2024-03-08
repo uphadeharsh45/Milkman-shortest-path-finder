@@ -12,7 +12,7 @@ const port = 5000
 app.use(cors())
 app.use(express.json());
 app.use('/api/auth',require('./routes/auth'))
-// app.use('/api/notes',require('./routes/notes'))
+app.use('/api/routes',require('./routes/Routes'))
 
 app.listen(port, () => {
   console.log(`Milkman backend listening on port ${port}`)
