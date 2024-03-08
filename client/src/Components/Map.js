@@ -12,9 +12,10 @@ const Map = () => {
   const [places, setPlaces] = useState([]);
   const [map, setmap] = useState(/** @type google.maps.Map */(null))
   const [searchPosition, setSearchPosition] = useState(null);
-  const[temp,settemp]=useState({name : "",lat: "", lng: "",time : ""})
+  const [temp, settemp] = useState({ name: "", lat: "", lng: "", time: "" })
   const autocompleteRef = useRef(null);
   const [clickedLatLng, setClickedLatLng] = useState(null);
+  let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
 
 
   const handleAutocompleteLoad = (autocomplete) => {
@@ -81,7 +82,7 @@ const Map = () => {
       return newPlaces;
     });
     // console.log(places) // Add temp to the places array
-  };  
+  };
   useEffect(() => {
     // console.log(clickedLatLng);
     console.log(places);
@@ -151,20 +152,20 @@ const Map = () => {
               <form>
                 <div className="mb-3">
                   <label htmlFor="recipient-name" className="col-form-label">Name:</label>
-                  <input type="text" className="form-control" id="recipient-name" style={{backgroundColor: '#e4e4e4',border:'1px solid black'}} value={temp.name} onChange={(e) => settemp({ ...temp, name: e.target.value })}/>
+                  <input type="text" className="form-control" id="recipient-name" style={{ backgroundColor: '#e4e4e4', border: '1px solid black' }} value={temp.name} onChange={(e) => settemp({ ...temp, name: e.target.value })} />
                 </div>
                 <div className="mb-3">
                   <label htmlFor="message-text" className="col-form-label">Time:</label><br />
-                  <input type="time" name="add_time" id="add_time" onChange={(e) => settemp({ ...temp, time: e.target.value })} value={temp.time} 
-                  style={{
-    padding: '6px 7px',
-    fontSize: '15px',
-    margin: '0px',
-    borderRadius: '7px',
-    backgroundColor: '#e4e4e4',
-    color: 'black',
-    cursor:'pointer'
-    }}/>
+                  <input type="time" name="add_time" id="add_time" onChange={(e) => settemp({ ...temp, time: e.target.value })} value={temp.time}
+                    style={{
+                      padding: '6px 7px',
+                      fontSize: '15px',
+                      margin: '0px',
+                      borderRadius: '7px',
+                      backgroundColor: '#e4e4e4',
+                      color: 'black',
+                      cursor: 'pointer'
+                    }} />
                 </div>
               </form>
             </div>
@@ -194,8 +195,8 @@ const Map = () => {
           <button className="btn btn-danger"
             style={{
               position: 'absolute',
-              top: '10px',
-              left: '10px',
+              top: '2vh',
+              left: '1vw',
               zIndex: '9999'
             }}
             onClick={() => {
@@ -204,6 +205,51 @@ const Map = () => {
           >
             Return
           </button>
+          <div className="container-fluid"
+            style={{
+              position: 'absolute',
+              top: '10vh',
+              left: '1vw',
+              width: '15vw',
+              zIndex: '9999',
+              backgroundColor: '#e4e4e4',
+              padding: '10px',
+              borderRadius: '1vh'
+            }}>
+            <div className="container mx-2">
+              {places.length === 0 && 'No destinations to Display'}
+            </div>
+            <ul
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                listStyle: 'none',
+                padding: '0.2vh',
+                fontWeight:'bold',
+                fontSize:fontSize
+              }}>
+              <li className='nav-item'>Name</li>
+              <li className='nav-item'>Time</li>
+            </ul>
+            {places.map((place,index) => (
+              <>
+              <Marker key={index} position={place} />
+              <ul
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  listStyle: 'none',
+                  padding: '0vh',
+                  fontSize:fontSize
+                }}>
+                <li className='nav-item'>{place.name}</li>
+                <li className='nav-item'>{place.time}</li>
+              </ul>
+              </>
+            ))}
+          </div>
         </GoogleMap>
       </div>
     </>
