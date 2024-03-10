@@ -167,7 +167,7 @@ const Map = () => {
                     <button className="btn btn-danger" type="submit" onClick={handleSearch}>Search</button>
                   </li>
                   <li className="nav-item mx-2">
-                    <button className="btn btn-danger" type="submit" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Place</button>
+                    <button className="btn btn-danger" type="submit" data-bs-toggle="modal" data-bs-target="#exampleModal">Add customer</button>
                   </li>
                   <li className="nav-item mx-2">
                     <button className="btn btn-danger" type="submit" onClick={handleCalculateRoute}>Calculate Route</button>
@@ -217,7 +217,7 @@ const Map = () => {
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-danger" onClick={handleadd}>Add Place</button>
+              <button type="button" className="btn btn-danger" onClick={handleadd}>Add Customer</button>
             </div>
           </div>
         </div>
