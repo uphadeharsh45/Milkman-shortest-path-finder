@@ -122,7 +122,7 @@ const Map = () => {
       return newPlaces;
     });
 
-  
+    settemp(prevTemp => ({ ...prevTemp, name: "" }));
     // console.log(places) // Add temp to the places array
   };
   useEffect(() => {
