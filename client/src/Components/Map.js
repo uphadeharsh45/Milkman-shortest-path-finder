@@ -17,8 +17,28 @@ const Map = () => {
   const [temp, settemp] = useState({ name: "", lat: "", lng: "", time: "" })
   const autocompleteRef = useRef(null);
   const [clickedLatLng, setClickedLatLng] = useState(null);
+  const [currentPosition, setCurrentPosition] = useState(null);
+
   let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
   let navigate=useNavigate();
+
+
+  useEffect(() => {
+    // Get the current position using the Geolocation API
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position.coords;
+          setCurrentPosition({ lat: latitude, lng: longitude });
+        },
+        error => {
+          console.error('Error getting current position:', error);
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
+  }, []);
 
   useEffect(() => {
     if(localStorage.getItem('token')){
@@ -226,7 +246,7 @@ const Map = () => {
         <GoogleMap
           onClick={mapClicked}
           zoom={15}
-          center={searchPosition || position}
+          center={searchPosition || currentPosition}
           mapContainerStyle={{ height: '100%', width: '100%' }}
           options={{
             fullscreenControl: true,
@@ -236,7 +256,7 @@ const Map = () => {
           }}
           onLoad={(map) => { setmap(map) }}
         >
-          <Marker position={position} />
+          <Marker position={currentPosition} />
           {clickedLatLng && <Marker position={clickedLatLng} />}
           <button className="btn btn-danger"
             style={{
@@ -246,7 +266,7 @@ const Map = () => {
               zIndex: '9999'
             }}
             onClick={() => {
-              map.panTo(position);
+              map.panTo(currentPosition);
             }}
           >
             Return
