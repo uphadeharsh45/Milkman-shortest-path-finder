@@ -32,6 +32,11 @@ const Map = () => {
     
   }, [])
 
+  const handleLogout =()=>{
+    localStorage.removeItem('token');
+    navigate("/login");
+  }
+
 
   const handleAutocompleteLoad = (autocomplete) => {
     autocompleteRef.current = autocomplete;
@@ -169,11 +174,12 @@ const Map = () => {
                   </li>
 
                   <li className="nav-item mx-2">
-                    <Link className='btn btn-danger mx-2' to='/login' role='button'>Login</Link>
+                    {/* <Link className='btn btn-danger mx-2' to='' role='button'>Login</Link> */}
+                    <button className='btn btn-danger mx-2' onClick={handleLogout}>Logout</button>
                   </li>
-                  <li className="nav-item">
+                  {/* <li className="nav-item">
                     <Link className='btn btn-danger mx-2' to='/signup' role='button'>Signup</Link>
-                  </li>
+                  </li> */}
                 </ul>
               </form>
             </div>
