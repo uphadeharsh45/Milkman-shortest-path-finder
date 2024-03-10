@@ -1,10 +1,18 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import plus from './plus.png'
 import saved_routes from './saved_routes.png'
-import background_image from './background_image.webp'
+// import background_image from './background_image.webp'
 
 function Dashboard() {
+
+  const navigate=useNavigate();
+
+  const handleLogout =()=>{
+    localStorage.removeItem('token');
+    navigate("/login");
+  }
+
   return (
     <>
     <div>
@@ -27,7 +35,7 @@ function Dashboard() {
               <form className="d-flex" role="search" onSubmit={(e) => e.preventDefault()}>
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
-                    <Link className='btn btn-danger mx-2' to='/login' role='button'>Logout</Link>
+                    <Link className='btn btn-danger mx-2' to='/login' role='button' onClick={handleLogout}>Logout</Link>
                   </li>
                 </ul>
               </form>
