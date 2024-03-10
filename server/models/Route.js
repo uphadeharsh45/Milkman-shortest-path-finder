@@ -13,7 +13,7 @@ const locationSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
-    timeConstraint: String,
+    time: String,
 });
 
 const routeSchema = new mongoose.Schema({
