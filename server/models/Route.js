@@ -5,11 +5,11 @@ const locationSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    latitude: {
+    lat: {
         type:Number,
         required:true
     },
-    longitude: {
+    lng: {
         type:Number,
         required:true
     },

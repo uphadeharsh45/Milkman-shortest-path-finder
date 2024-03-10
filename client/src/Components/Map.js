@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+
 
 const libraries = ['places'];
 const Map = () => {
@@ -16,6 +18,19 @@ const Map = () => {
   const autocompleteRef = useRef(null);
   const [clickedLatLng, setClickedLatLng] = useState(null);
   let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
+  let navigate=useNavigate();
+
+  useEffect(() => {
+    if(localStorage.getItem('token')){
+        // getallnotes()
+        console.log(localStorage.getItem('token'))
+    }
+    else{
+      console.log("logging in .....")
+        navigate("/login");
+    }
+    
+  }, [])
 
 
   const handleAutocompleteLoad = (autocomplete) => {
@@ -88,6 +103,31 @@ const Map = () => {
     console.log(places);
   }, [places]);
 
+    // Function to handle the "Calculate Route" button click event
+    const handleCalculateRoute = async () => {
+      try {
+        // Make an HTTP POST request using the Fetch API
+        const response = await fetch('http://localhost:5000/api/routes/addroute', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            "auth-token": localStorage.getItem('token')
+
+          },
+          body: JSON.stringify({
+           
+            locations: places // Pass the places array to be added to the route
+          }),
+        });
+        const data = await response.json();
+        console.log('Route added successfully:', data);
+        // Handle success or redirect to another page if needed
+      } catch (error) {
+        console.error('Error adding route:', error);
+        // Handle error
+      }
+    };
+
   if (!isLoaded) {
     return (<div>Map not Loaded</div>)
   }
@@ -125,7 +165,7 @@ const Map = () => {
                     <button className="btn btn-danger" type="submit" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Place</button>
                   </li>
                   <li className="nav-item mx-2">
-                    <button className="btn btn-danger" type="submit">Calculate Route</button>
+                    <button className="btn btn-danger" type="submit" onClick={handleCalculateRoute}>Calculate Route</button>
                   </li>
 
                   <li className="nav-item mx-2">
