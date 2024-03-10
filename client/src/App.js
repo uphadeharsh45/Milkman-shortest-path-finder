@@ -10,6 +10,7 @@ import Dashboard from './Components/Dashboard';
 import Alert from './Components/Alert';
 import { useState } from 'react';
 import Map from './Components/Map';
+import SavedRoutes from './Components/SavedRoutes';
 
 function App() {
   const[alert,setAlert]=useState(null);
@@ -32,6 +33,7 @@ function App() {
             <Route exact path="/signup" element={<Signup showAlert={showAlert}/>} />
             <Route exact path="/" element={<Dashboard showAlert={showAlert}/>} />
             <Route exact path="/map" element={<Map showAlert={showAlert}/>} />
+            <Route exact path="/savedroutes" element={<SavedRoutes showAlert={showAlert}/>} />
           </Routes>
         </div>
       </BrowserRouter>
