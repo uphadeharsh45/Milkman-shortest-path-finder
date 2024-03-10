@@ -11,6 +11,8 @@ import Alert from './Components/Alert';
 import { useState } from 'react';
 import Map from './Components/Map';
 import SavedRoutes from './Components/SavedRoutes';
+import ShowRoute from './Components/ShowRoute';
+import RoutesState from './context/routes/RoutesState';
 
 function App() {
   const[alert,setAlert]=useState(null);
@@ -25,6 +27,7 @@ function App() {
   }
   return (
     <div className="App">
+     <RoutesState>
       <BrowserRouter>
       {/* <Alert alert={alert}/> */}
         <div className="container-1">
@@ -34,9 +37,11 @@ function App() {
             <Route exact path="/" element={<Dashboard showAlert={showAlert}/>} />
             <Route exact path="/map" element={<Map showAlert={showAlert}/>} />
             <Route exact path="/savedroutes" element={<SavedRoutes showAlert={showAlert}/>} />
+            <Route exact path="/showroute" element={<ShowRoute showAlert={showAlert}/>} />
           </Routes>
         </div>
       </BrowserRouter>
+      </RoutesState>
     </div>
   );
 }
