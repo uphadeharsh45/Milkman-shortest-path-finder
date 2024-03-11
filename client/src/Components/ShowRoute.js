@@ -10,7 +10,7 @@ const ShowRoute = () => {
 
   const navigate = useNavigate();
   const context = useContext(routeContext);
-  const { routes, getallroutes,updateRoute,deleteRoute } = context;
+  const { routes, getallroutes,updateRoute,deleteRoute,deleteCustomer } = context;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,7 +95,7 @@ const ShowRoute = () => {
               {index.locations.map((place) => (
                 <tbody>
                   <tr>
-                    <td className='table-sm'><i className="fa-solid fa-trash mx-2"></i></td>
+                    <td className='table-sm'><i className="fa-solid fa-trash mx-2" onClick={()=>{deleteCustomer(index._id,place._id)}}></i></td>
                     <td ><i className="fa-solid fa-pen mx-2"></i></td>
                     <td >{place.name}</td>
                     <td >{place.time}</td>
