@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
+import Spinner from './Spinner';
 
 
 const libraries = ['places'];
@@ -155,9 +156,13 @@ const Map = () => {
       }
     };
 
-  if (!isLoaded) {
-    return (<div>Map not Loaded</div>)
-  }
+    if (!isLoaded) {
+      return (
+        <div className="container" style={{marginTop:'25%'}}>
+          <Spinner/>
+        </div>
+      )
+    }
 
   const position = { lat: 19.1602, lng: 77.3102 };
   return (
