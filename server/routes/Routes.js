@@ -65,7 +65,25 @@ router.delete("/deleteroute/:id",fetchuser,async (req,res)=>{
 })
 
 // Route 4 : Update Route by Adding a new Place 
-
+router.put('/updateroute/:id',fetchuser, async (req, res) => {
+    const { id } = req.params; // ID of the route
+    const { newLocations } = req.body; // New locations array to replace
+  
+    try {
+      // Find the route by ID
+      const route = await Routes.findByIdAndUpdate(id, { locations: newLocations }, { new: true });
+  
+      if (!route) {
+        return res.status(404).json({ message: 'Route not found' });
+      }
+  
+      res.status(200).json({ message: 'Route updated successfully', route });
+    } catch (error) {
+      console.error('Error updating route:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+  
 
 
 module.exports = router

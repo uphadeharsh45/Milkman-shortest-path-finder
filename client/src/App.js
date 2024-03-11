@@ -12,7 +12,7 @@ import { useState } from 'react';
 import Map from './Components/Map';
 import ShowRoute from './Components/ShowRoute';
 import RoutesState from './context/routes/RoutesState';
-import ShowonMap from './Components/ShowonMap';
+import Showonmap from './Components/Showonmap';
 
 function App() {
   const[alert,setAlert]=useState(null);
@@ -37,7 +37,7 @@ function App() {
             <Route exact path="/" element={<Dashboard showAlert={showAlert}/>} />
             <Route exact path="/map" element={<Map showAlert={showAlert}/>} />
             <Route exact path="/showroute" element={<ShowRoute showAlert={showAlert}/>} />
-            <Route exact path="/showonmap" element={<ShowonMap showAlert={showAlert}/>} />
+            <Route exact path="/showonmap" element={<Showonmap showAlert={showAlert}/>} />
           </Routes>
         </div>
       </BrowserRouter>

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import routeContext from '../context/routes/routeContext';
-import ShowonMap from './ShowonMap';
+
 
 const ShowRoute = () => {
 
@@ -38,8 +38,12 @@ const ShowRoute = () => {
     navigate("/login");
   }
 
-  const showroute=(index)=>{
-    console.log(index.locations);
+  // const showroute=(index)=>{
+  //   console.log(index.locations);
+  // }
+
+  const showroute = (id, locations) => {
+    navigate("/showonmap", { state: { id, locations } });
   }
 
   return (
@@ -76,7 +80,7 @@ const ShowRoute = () => {
       <div className="container" style={{ padding: '2vw' }}>
         {routes.map((index, arrayindex) => (
           <div style={{padding:'1vw'}}>
-            <h3>{`Route ${arrayindex + 1}`}<i className="fa-solid fa-trash mx-5"></i><button className="btn btn-danger" type="submit" onClick={(index)=>{showroute(index)}}>Show Route</button></h3>
+            <h3>{`Route ${arrayindex + 1}`}<i className="fa-solid fa-trash mx-5"></i><button className="btn btn-danger" type="submit" onClick={() => showroute(index._id, index.locations)}>Show Route</button></h3>
             <table className='table table-bordered table-dark' id={index} >
               <thead>
                 <tr>
