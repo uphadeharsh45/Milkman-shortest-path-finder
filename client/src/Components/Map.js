@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
-import Spinner from './Spinner';
+// import Spinner from './Spinner';
 
 
 const libraries = ['places'];
@@ -159,7 +159,7 @@ const Map = () => {
     if (!isLoaded) {
       return (
         <div className="container" style={{marginTop:'25%'}}>
-          <Spinner/>
+          {/* <Spinner/> */}
         </div>
       )
     }
