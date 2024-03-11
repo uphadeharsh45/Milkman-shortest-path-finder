@@ -31,6 +31,7 @@ const Map = () => {
         position => {
           const { latitude, longitude } = position.coords;
           setCurrentPosition({ lat: latitude, lng: longitude });
+          console.log(currentPosition);
         },
         error => {
           console.error('Error getting current position:', error);
@@ -159,7 +160,8 @@ const Map = () => {
     if (!isLoaded) {
       return (
         <div className="container" style={{marginTop:'25%'}}>
-          <Spinner/>
+          {/* <Spinner/> */}
+          map not loaded 
         </div>
       )
     }

@@ -10,7 +10,7 @@ const ShowRoute = () => {
 
   const navigate = useNavigate();
   const context = useContext(routeContext);
-  const { routes, getallroutes } = context;
+  const { routes, getallroutes,updateRoute,deleteRoute } = context;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,6 +46,8 @@ const ShowRoute = () => {
     navigate("/showonmap", { state: { id, locations } });
   }
 
+  
+
   return (
     <div>
       <div>
@@ -80,7 +82,7 @@ const ShowRoute = () => {
       <div className="container" style={{ padding: '2vw' }}>
         {routes.map((index, arrayindex) => (
           <div style={{padding:'1vw'}}>
-            <h3>{`Route ${arrayindex + 1}`}<i className="fa-solid fa-trash mx-5"></i><button className="btn btn-danger" type="submit" onClick={() => showroute(index._id, index.locations)}>Show Route</button></h3>
+            <h3>{`Route ${arrayindex + 1}`}<i className="fa-solid fa-trash mx-5" onClick={()=>{deleteRoute(index._id)}}></i><button className="btn btn-danger" type="submit" onClick={() => showroute(index._id, index.locations)}>Show Route</button></h3>
             <table className='table table-bordered table-dark' id={index} >
               <thead>
                 <tr>
