@@ -85,5 +85,68 @@ router.put('/updateroute/:id',fetchuser, async (req, res) => {
   });
   
 
+  // Route 5 : to delete a customer from a route
+router.delete('/deletecustomer/:routeId/:customerId',fetchuser, async (req, res) => {
+    const { routeId, customerId } = req.params;
+  
+    try {
+      // Find the route by ID
+      const route = await Routes.findById(routeId);
+  
+      if (!route) {
+        return res.status(404).json({ message: 'Route not found' });
+      }
+  
+      // Find the index of the customer in the route's locations array
+      const customerIndex = route.locations.findIndex(customer => customer._id == customerId);
+  
+      if (customerIndex === -1) {
+        return res.status(404).json({ message: 'Customer not found in route' });
+      }
+  
+      // Remove the customer from the route's locations array
+      route.locations.splice(customerIndex, 1);
+  
+      // Save the updated route
+      await route.save();
+  
+      res.status(200).json({ message: 'Customer deleted successfully', route });
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+
+// Route 6: to update the time of a customer in a route
+router.put('/updatetime/:routeId/:customerId',fetchuser, async (req, res) => {
+    const { routeId, customerId } = req.params;
+    const { newTime } = req.body;
+  
+    try {
+      const route = await Routes.findById(routeId);
+  
+      if (!route) {
+        return res.status(404).json({ message: 'Route not found' });
+      }
+  
+      const customer = route.locations.find(customer => customer._id == customerId);
+  
+      if (!customer) {
+        return res.status(404).json({ message: 'Customer not found in route' });
+      }
+  
+      // Update the time of the customer
+      customer.time = newTime;
+  
+      await route.save();
+  
+      res.status(200).json({ message: 'Customer time updated successfully', route });
+    } catch (error) {
+      console.error('Error updating customer time:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+
+
 
 module.exports = router

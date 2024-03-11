@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 // import Spinner from './Spinner';
 // import Spinner from './Spinner';
 import { useLocation } from 'react-router-dom'
+import { useContext } from 'react';
+import routeContext from '../context/routes/routeContext';
 
 
 const libraries = ['places'];
@@ -14,6 +16,8 @@ const Showonmap = () => {
     libraries: libraries
   })
 
+  const context = useContext(routeContext);
+  const { routes, getallroutes,updateRoute,deleteRoute } = context;
   const { state } = useLocation();
   const { id, locations } = state;
   const [places, setPlaces] = useState(locations);
@@ -120,18 +124,27 @@ const Showonmap = () => {
     console.log(temp);
   }, [clickedLatLng]);
 
-  const handleadd = () => {
+  const handleadd =async () => {
     // Perform validation if needed
-    console.log(temp); // Here you have access to the complete temp object with all values
-    setPlaces(prevPlaces => {
-      const newPlaces = [...prevPlaces, temp];
-      // console.log("New places:", newPlaces);
-      return newPlaces;
-    });
+    // console.log(temp); // Here you have access to the complete temp object with all values
+    // setPlaces(prevPlaces => {
+    //   const newPlaces =  [...prevPlaces, temp];
+    //   // console.log("New places:", newPlaces);
+    //   return newPlaces;
+    // });
+
+    const updatedLocations = [...places, temp];
+
+    // Update the route with the new locations
+    await updateRoute(id, updatedLocations);
+
+    // Update the local state with the new locations
+    setPlaces(updatedLocations);
 
     settemp(prevTemp => ({ ...prevTemp, name: "" }));
     // console.log(places) // Add temp to the places array
   };
+
   useEffect(() => {
     // console.log(clickedLatLng);
     console.log(places);

@@ -82,10 +82,69 @@ const RoutesState = (props) => {
     };
 
 
+    const deleteCustomer = async (routeId, customerId) => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/routes/deletecustomer/${routeId}/${customerId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'auth-token': localStorage.getItem('token') // Assuming you're using token-based authentication
+          }
+        });
+    
+        const data = await response.json();
+    
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to delete customer');
+        }
+
+           // Update the frontend state to reflect the changes
+     setRoutes(prevRoutes => {
+      const updatedRoutes = prevRoutes.map(route => {
+        if (route._id === routeId) {
+          // Filter out the deleted customer from the locations array
+          route.locations = route.locations.filter(customer => customer._id !== customerId);
+        }
+        return route;
+      });
+      return updatedRoutes;
+    });
+    
+        console.log('Customer deleted successfully');
+        // Return any necessary data or handle success
+      } catch (error) {
+        console.error('Error deleting customer:', error);
+        // Handle error
+      }
+    };
+
+    const updateTime = async (routeId,customerId, newTime) => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/routes/updatetime/${routeId}/${customerId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'auth-token': localStorage.getItem('token')
+          },
+          body: JSON.stringify({ newTime })
+        });
+    
+        const data = await response.json();
+    
+        if (response.ok) {
+
+        } else {
+          console.error('Failed to update time:', data.message);
+        }
+      } catch (error) {
+        console.error('Error updating time:', error);
+      }
+    };
+
 
 
   return (
-    <routeContext.Provider value={{ routes, getallroutes,updateRoute,deleteRoute }}>
+    <routeContext.Provider value={{ routes, getallroutes,updateRoute,deleteRoute,deleteCustomer,updateTime }}>
       {props.children}
     </routeContext.Provider>
   )
