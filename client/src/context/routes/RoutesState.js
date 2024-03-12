@@ -118,29 +118,48 @@ const RoutesState = (props) => {
       }
     };
 
-    const updateTime = async (routeId,customerId, newTime) => {
+    const updateTime = async (routeId, customerId, newTime) => {
       try {
         const response = await fetch(`http://localhost:5000/api/routes/updatetime/${routeId}/${customerId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'auth-token': localStorage.getItem('token')
+            'auth-token': localStorage.getItem('token') // Assuming you're using token-based authentication
           },
-          body: JSON.stringify({ newTime })
+          body: JSON.stringify({ newTime }) // Send the new time in the request body
         });
     
         const data = await response.json();
     
-        if (response.ok) {
-
-        } else {
-          console.error('Failed to update time:', data.message);
+        if (!response.ok) {
+          throw new Error(data.message || 'Failed to update customer');
         }
+    
+        // Update the frontend state to reflect the changes
+        setRoutes(prevRoutes => {
+          const updatedRoutes = prevRoutes.map(route => {
+            if (route._id === routeId) {
+              // Update the time of the specific customer
+              route.locations = route.locations.map(customer => {
+                if (customer._id === customerId) {
+                  return { ...customer, time: newTime };
+                }
+                return customer;
+              });
+            }
+            return route;
+          });
+          return updatedRoutes;
+        });
+    
+        console.log('Customer updated successfully');
+        // Return any necessary data or handle success
       } catch (error) {
-        console.error('Error updating time:', error);
+        console.error('Error updating customer:', error);
+        // Handle error
       }
     };
-
+    
 
 
   return (
