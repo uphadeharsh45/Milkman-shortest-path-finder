@@ -10,7 +10,10 @@ const ShowRoute = () => {
 
   const navigate = useNavigate();
   const context = useContext(routeContext);
-  const { routes, getallroutes,updateRoute,deleteRoute,deleteCustomer } = context;
+  const { routes, getallroutes,updateRoute,deleteRoute,deleteCustomer,updateTime } = context;
+  const [routeIdtoUpdate,setRouteIdtoUpdate]=useState('');
+  const [custIdtoUpdate,setCustIdtoUpdate]=useState('');
+  const [newTime,setNewTime]=useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,6 +39,11 @@ const ShowRoute = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate("/login");
+  }
+
+  const handleEditCustomer=()=>{
+    updateTime(routeIdtoUpdate,custIdtoUpdate,newTime);
+    setNewTime('');
   }
 
   // const showroute=(index)=>{
@@ -87,10 +95,10 @@ const ShowRoute = () => {
             </div>
             <div className="modal-body">
               <form>
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <label htmlFor="recipient-name" className="col-form-label">Name:</label>
                   <input type="text" className="form-control" id="recipient-name" style={{ backgroundColor: '#e4e4e4', border: '1px solid black' }} />
-                </div>
+                </div> */}
                 <div className="mb-3">
                   <label htmlFor="message-text" className="col-form-label">Time:</label><br />
                   <input type="time" name="add_time" id="add_time"
@@ -102,13 +110,13 @@ const ShowRoute = () => {
                       backgroundColor: '#e4e4e4',
                       color: 'black',
                       cursor: 'pointer'
-                    }} />
+                    }} value={newTime} onChange={(e) => setNewTime(e.target.value)}  />
                 </div>
               </form>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" >Edit Customer</button>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleEditCustomer}>Edit Customer</button>
             </div>
           </div>
         </div>
@@ -131,7 +139,7 @@ const ShowRoute = () => {
                 <tbody>
                   <tr>
                     <td className='table-sm'><i className="fa-solid fa-trash mx-2" onClick={()=>{deleteCustomer(index._id,place._id)}}></i></td>
-                    <td ><i className="fa-solid fa-pen mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal"></i></td>
+                    <td ><i className="fa-solid fa-pen mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onClick={()=>{setCustIdtoUpdate(place._id);setRouteIdtoUpdate(index._id)}} ></i></td>
                     <td >{place.name}</td>
                     <td >{place.time}</td>
                   </tr>
