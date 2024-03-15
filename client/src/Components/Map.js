@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api'
+import { useJsApiLoader, GoogleMap, Marker, Autocomplete,DirectionsService, DirectionsRenderer } from '@react-google-maps/api'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
+import DistanceMatrix from './DistanceMatrix';
 
 
-const libraries = ['places'];
+const libraries = ['places','directions'];
 const Map = () => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: 'AIzaSyDxgAdwDaCyixQZ-GHZRxejom_NGRQ4s8M',
@@ -19,6 +20,11 @@ const Map = () => {
   const autocompleteRef = useRef(null);
   const [clickedLatLng, setClickedLatLng] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(null);
+  const [optimizedLocations, setOptimizedLocations] = useState([]);
+  const [testlocation,setTestlocation]=useState([]);
+  const [deadline,setDeadline]=useState([]);
+  const [directionsResponse, setDirectionsResponse] = useState(null);
+
 
   let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
   let navigate=useNavigate();
@@ -44,7 +50,6 @@ const Map = () => {
 
   useEffect(() => {
     if(localStorage.getItem('token')){
-        // getallnotes()
         console.log(localStorage.getItem('token'))
     }
     else{
@@ -116,7 +121,6 @@ const Map = () => {
   }, [clickedLatLng]);
 
   const handleadd = () => {
-    // Perform validation if needed
     console.log(temp); // Here you have access to the complete temp object with all values
     setPlaces(prevPlaces => {
       const newPlaces = [...prevPlaces, temp];
@@ -128,14 +132,11 @@ const Map = () => {
     // console.log(places) // Add temp to the places array
   };
   useEffect(() => {
-    // console.log(clickedLatLng);
     console.log(places);
   }, [places]);
 
-    // Function to handle the "Calculate Route" button click event
     const handleCalculateRoute = async () => {
       try {
-        // Make an HTTP POST request using the Fetch API
         const response = await fetch('http://localhost:5000/api/routes/addroute', {
           method: 'POST',
           headers: {
@@ -150,12 +151,95 @@ const Map = () => {
         });
         const data = await response.json();
         console.log('Route added successfully:', data);
-        // Handle success or redirect to another page if needed
       } catch (error) {
         console.error('Error adding route:', error);
-        // Handle error
       }
+      const newlocations = places.map(place => ({
+        lat: place.lat,
+        lng: place.lng
+      }));
+
+      if (currentPosition) {
+        newlocations.unshift({
+          lat: currentPosition.lat,
+          lng: currentPosition.lng
+        });
+      }
+
+   
+    setTestlocation(newlocations);
+
+     // Calculate time difference for deadlines
+  const currentDate = new Date();
+  const currentHours = currentDate.getHours();
+  const currentMinutes = currentDate.getMinutes();
+  const currentTime = currentHours + currentMinutes / 60; // Convert current time to hours
+
+  const deadlines = places.map((place, index) => {
+    // Parse place time
+    const placeTimeParts = place.time.split(":");
+    const placeHours = parseInt(placeTimeParts[0]);
+    const placeMinutes = parseInt(placeTimeParts[1]);
+    const placeTimeInHours = placeHours + placeMinutes / 60;
+
+    // Calculate time difference in hours
+    return Math.abs(placeTimeInHours - currentTime); // Absolute difference in hours
+  });
+
+  deadlines.unshift(0);
+
+  setDeadline(deadlines);
+      
     };
+
+    useEffect(() => {
+      const newarr=optimizedLocations.slice(0, Math.ceil(optimizedLocations.length / 2));
+      console.log(newarr)
+    }, [optimizedLocations]);
+
+    useEffect(()=>{
+      console.log(testlocation);
+      console.log(deadline);
+    },[testlocation,deadline])
+
+    const fetchDirections = () => {
+      if (optimizedLocations.length < 2) {
+        return; // Not enough locations for directions
+      }
+    // eslint-disable-next-line no-undef
+      const origin = new google.maps.LatLng(optimizedLocations[0].lat, optimizedLocations[0].lng);
+       // eslint-disable-next-line no-undef
+      const destination = new google.maps.LatLng(optimizedLocations[optimizedLocations.length - 1].lat, optimizedLocations[optimizedLocations.length - 1].lng);
+      const waypoints = optimizedLocations.slice(1, -1).map(location => ({
+            // eslint-disable-next-line no-undef
+        location: new google.maps.LatLng(location.lat, location.lng),
+        stopover: true
+      }));
+    // eslint-disable-next-line no-undef
+      const directionsService = new google.maps.DirectionsService();
+      directionsService.route(
+        {
+          origin,
+          destination,
+          waypoints,
+              // eslint-disable-next-line no-undef
+          travelMode: google.maps.TravelMode.DRIVING
+        },
+        (result, status) => {
+              // eslint-disable-next-line no-undef
+          if (status === google.maps.DirectionsStatus.OK) {
+            setDirectionsResponse(result);
+          } else {
+            console.error('Directions request failed due to ' + status);
+            setDirectionsResponse(null);
+          }
+        }
+      );
+    };
+
+    useEffect(() => {
+      fetchDirections();
+    }, [optimizedLocations]);
 
     if (!isLoaded) {
       return (
@@ -169,6 +253,7 @@ const Map = () => {
   const position = { lat: 19.1602, lng: 77.3102 };
   return (
     <>
+     <DistanceMatrix locations={{ location: testlocation, deadline: deadline }} setOptimizedLocations={setOptimizedLocations} />
       <div>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
@@ -203,12 +288,9 @@ const Map = () => {
                   </li>
 
                   <li className="nav-item mx-2">
-                    {/* <Link className='btn btn-danger mx-2' to='' role='button'>Login</Link> */}
                     <button className='btn btn-danger mx-2' onClick={handleLogout}>Logout</button>
                   </li>
-                  {/* <li className="nav-item">
-                    <Link className='btn btn-danger mx-2' to='/signup' role='button'>Signup</Link>
-                  </li> */}
+               
                 </ul>
               </form>
             </div>
@@ -325,6 +407,13 @@ const Map = () => {
               </>
             ))}
           </div>
+          {directionsResponse && (
+    <DirectionsRenderer
+      options={{
+        directions: directionsResponse
+      }}
+    />
+  )}
         </GoogleMap>
       </div>
     </>
