@@ -9,7 +9,7 @@ import { useContext } from 'react';
 import routeContext from '../context/routes/routeContext';
 
 
-const libraries = ['places'];
+const libraries = ['places','directions'];
 const Showonmap = () => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: 'AIzaSyDxgAdwDaCyixQZ-GHZRxejom_NGRQ4s8M',

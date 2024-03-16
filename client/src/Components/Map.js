@@ -12,7 +12,7 @@ const Map = () => {
     googleMapsApiKey: 'AIzaSyDxgAdwDaCyixQZ-GHZRxejom_NGRQ4s8M',
     libraries: libraries
   })
-
+  let newarr=[]
   const [places, setPlaces] = useState([]);
   const [map, setmap] = useState(/** @type google.maps.Map */(null))
   const [searchPosition, setSearchPosition] = useState(null);
@@ -24,6 +24,8 @@ const Map = () => {
   const [testlocation,setTestlocation]=useState([]);
   const [deadline,setDeadline]=useState([]);
   const [directionsResponse, setDirectionsResponse] = useState(null);
+  const [markers, setMarkers] = useState([]);
+  const [directionsPanel, setDirectionsPanel] = useState(null);
 
 
   let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
@@ -37,6 +39,7 @@ const Map = () => {
         position => {
           const { latitude, longitude } = position.coords;
           setCurrentPosition({ lat: latitude, lng: longitude });
+          setMarkers(prevMarkers => [...prevMarkers, { lat: latitude, lng: longitude }]);
           console.log(currentPosition);
         },
         error => {
@@ -127,7 +130,7 @@ const Map = () => {
       // console.log("New places:", newPlaces);
       return newPlaces;
     });
-
+    setMarkers(prevMarkers => [...prevMarkers,{ lat: temp.lat, lng: temp.lng } ]);
     settemp(prevTemp => ({ ...prevTemp, name: "" }));
     // console.log(places) // Add temp to the places array
   };
@@ -135,7 +138,12 @@ const Map = () => {
     console.log(places);
   }, [places]);
 
+  const clearMarkers = () => {
+    setMarkers([]); // Clear the markers array
+  };
+
     const handleCalculateRoute = async () => {
+      clearMarkers();
       try {
         const response = await fetch('http://localhost:5000/api/routes/addroute', {
           method: 'POST',
@@ -193,7 +201,7 @@ const Map = () => {
     };
 
     useEffect(() => {
-      const newarr=optimizedLocations.slice(0, Math.ceil(optimizedLocations.length / 2));
+       newarr=optimizedLocations.slice(0, Math.ceil(optimizedLocations.length / 2));
       console.log(newarr)
     }, [optimizedLocations]);
 
@@ -203,14 +211,14 @@ const Map = () => {
     },[testlocation,deadline])
 
     const fetchDirections = () => {
-      if (optimizedLocations.length < 2) {
+      if (newarr.length < 2) {
         return; // Not enough locations for directions
       }
     // eslint-disable-next-line no-undef
-      const origin = new google.maps.LatLng(optimizedLocations[0].lat, optimizedLocations[0].lng);
+      const origin = new google.maps.LatLng(newarr[0].lat, newarr[0].lng);
        // eslint-disable-next-line no-undef
-      const destination = new google.maps.LatLng(optimizedLocations[optimizedLocations.length - 1].lat, optimizedLocations[optimizedLocations.length - 1].lng);
-      const waypoints = optimizedLocations.slice(1, -1).map(location => ({
+      const destination = new google.maps.LatLng(newarr[newarr.length - 1].lat, newarr[newarr.length - 1].lng);
+      const waypoints = newarr.slice(1, -1).map(location => ({
             // eslint-disable-next-line no-undef
         location: new google.maps.LatLng(location.lat, location.lng),
         stopover: true
@@ -238,6 +246,7 @@ const Map = () => {
     };
 
     useEffect(() => {
+      if(!directionsResponse)
       fetchDirections();
     }, [optimizedLocations]);
 
@@ -347,7 +356,7 @@ const Map = () => {
           }}
           onLoad={(map) => { setmap(map) }}
         >
-          <Marker position={currentPosition} />
+          {/* <Marker position={currentPosition} /> */}
           {clickedLatLng && <Marker position={clickedLatLng} />}
           <button className="btn btn-danger"
             style={{
@@ -391,7 +400,7 @@ const Map = () => {
             </ul>
             {places.map((place,index) => (
               <>
-              <Marker key={index} position={place} />
+              {/* <Marker key={index} position={place} /> */}
               <ul
                 style={{
                   display: 'flex',
@@ -410,11 +419,16 @@ const Map = () => {
           {directionsResponse && (
     <DirectionsRenderer
       options={{
-        directions: directionsResponse
+        directions: directionsResponse,
+        panel: directionsPanel // Display textual directions in a panel
       }}
     />
   )}
+   {markers.map((marker, index) => (
+          <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} />
+        ))}
         </GoogleMap>
+        <div ref={setDirectionsPanel} />
       </div>
     </>
   )
