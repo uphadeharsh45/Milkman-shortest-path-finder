@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import login_img from './login.jpg'
 
 const Login = (props) => {
 
@@ -35,24 +36,34 @@ const Login = (props) => {
   }
 
   return (
-    <div>
-      <h2>Login to iNotebook</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="email" className="form-label">Email address</label>
-          <input type="email" name="email" className="form-control" id="email" aria-describedby="emailHelp" value={credentials.email} onChange={onChange} />
-          <div id="emailHelp" className="form-text">We'll never share your email with anyone else.</div>
-        </div>
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">Password</label>
-          <input type="password" name='password' className="form-control" id="password" value={credentials.password} onChange={onChange} />
-        </div>
-        <div className="mb-3 form-check">
-
-        </div>
-        <button type="submit" className="btn btn-primary" >Submit</button>
-      </form>
+    <>
+    <div className='d-flex justify-content-center' style={{marginTop:'20vh'}}>
+    <div className="container mx-5 d-none d-md-block">
+    <img src={login_img} alt="Login Image" className="img-fluid mb-3" />
     </div>
+    <div className='container mx-5' style={{marginTop:'0%',}}>
+      <div className="container" style={{padding:'1vh',borderRadius:'2vh',backgroundColor:'#F0F0F8',width:'70vh'}}>
+      <h2 className='my-5' style={{color:'#dc3545'}}>LOGIN</h2>
+      <div className="container" >
+      <form onSubmit={handleSubmit}>
+        <div className="my-4">
+          <label htmlFor="email" className="form-label">Email address</label>
+          <input type="email" name="email" className="form-control" id="email" aria-describedby="emailHelp" value={credentials.email} onChange={onChange} style={{borderColor:'#FF3444'}}/>
+        </div>
+        <div className="my-4">
+          <label htmlFor="password" className="form-label">Password</label>
+          <input type="password" name='password' className="form-control" id="password" value={credentials.password} onChange={onChange} style={{borderColor:'#FF3444'}}/>
+        </div>
+        <button type="submit" className="btn btn-danger my-4" >Login</button>
+        <div className="container my-2">
+          Not Signed Up?<Link className="nav-link active" aria-current="page" to="/signup" style={{color:'#FF3444',textDecoration:'underline'}}>Signup</Link>
+        </div>
+      </form>
+      </div>
+      </div>
+    </div>
+    </div>
+    </>
   )
 }
 
