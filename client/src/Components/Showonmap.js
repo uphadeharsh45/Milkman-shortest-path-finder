@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useJsApiLoader, GoogleMap, Marker, Autocomplete } from '@react-google-maps/api'
+import { useJsApiLoader, GoogleMap, Marker, Autocomplete ,DirectionsRenderer} from '@react-google-maps/api'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 // import Spinner from './Spinner';
@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom'
 import { useContext } from 'react';
 import routeContext from '../context/routes/routeContext';
+import DistanceMatrix from './DistanceMatrix';
 
 
 const libraries = ['places','directions'];
@@ -16,6 +17,7 @@ const Showonmap = () => {
     libraries: libraries
   })
 
+  let newarr=[]
   const context = useContext(routeContext);
   const { routes, getallroutes,updateRoute,deleteRoute } = context;
   const { state } = useLocation();
@@ -29,6 +31,15 @@ const Showonmap = () => {
   const autocompleteRef = useRef(null);
   const [clickedLatLng, setClickedLatLng] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(null);
+  const [markers, setMarkers] = useState([]);
+  const [optimizedLocations, setOptimizedLocations] = useState([]);
+  const [testlocation,setTestlocation]=useState([]);
+  const [deadline,setDeadline]=useState([]);
+  const [directionsResponse, setDirectionsResponse] = useState(null);
+  const [directionsPanel, setDirectionsPanel] = useState(null);
+  
+
+
 
   let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
   let navigate=useNavigate();
@@ -41,6 +52,8 @@ const Showonmap = () => {
         position => {
           const { latitude, longitude } = position.coords;
           setCurrentPosition({ lat: latitude, lng: longitude });
+          setMarkers(prevMarkers => [...prevMarkers, { lat: latitude, lng: longitude }]);
+
         },
         error => {
           console.error('Error getting current position:', error);
@@ -62,6 +75,11 @@ const Showonmap = () => {
     }
     
   }, [])
+
+  useEffect(() => {
+    // Update markers when places change
+    setMarkers(places.map(place => ({ lat: place.lat, lng: place.lng })));
+  }, [places]);
 
   const handleLogout =()=>{
     localStorage.removeItem('token');
@@ -119,10 +137,10 @@ const Showonmap = () => {
     // console.log(clickedLatLng); 
   };
 
-  useEffect(() => {
-    // console.log(clickedLatLng);
-    console.log(temp);
-  }, [clickedLatLng]);
+  // useEffect(() => {
+  //   // console.log(clickedLatLng);
+  //   console.log(temp);
+  // }, [clickedLatLng]);
 
   const handleadd =async () => {
     // Perform validation if needed
@@ -145,35 +163,129 @@ const Showonmap = () => {
     // console.log(places) // Add temp to the places array
   };
 
-  useEffect(() => {
-    // console.log(clickedLatLng);
-    console.log(places);
-  }, [places]);
+  // useEffect(() => {
+  //   // console.log(clickedLatLng);
+  //   console.log(places);
+  // }, [places]);
+
+  const clearMarkers = () => {
+    setMarkers([]); // Clear the markers array
+  };
+
 
     // Function to handle the "Calculate Route" button click event
     const handleCalculateRoute = async () => {
-      try {
-        // Make an HTTP POST request using the Fetch API
-        const response = await fetch('http://localhost:5000/api/routes/addroute', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            "auth-token": localStorage.getItem('token')
+      clearMarkers();
+      // try {
+      //   // Make an HTTP POST request using the Fetch API
+      //   const response = await fetch('http://localhost:5000/api/routes/addroute', {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //       "auth-token": localStorage.getItem('token')
 
-          },
-          body: JSON.stringify({
+      //     },
+      //     body: JSON.stringify({
            
-            locations: places // Pass the places array to be added to the route
-          }),
+      //       locations: places // Pass the places array to be added to the route
+      //     }),
+      //   });
+      //   const data = await response.json();
+      //   console.log('Route added successfully:', data);
+      //   // Handle success or redirect to another page if needed
+      // } catch (error) {
+      //   console.error('Error adding route:', error);
+      //   // Handle error
+      // }
+
+      const newlocations = places.map(place => ({
+        lat: place.lat,
+        lng: place.lng
+      }));
+
+      if (currentPosition) {
+        newlocations.unshift({
+          lat: currentPosition.lat,
+          lng: currentPosition.lng
         });
-        const data = await response.json();
-        console.log('Route added successfully:', data);
-        // Handle success or redirect to another page if needed
-      } catch (error) {
-        console.error('Error adding route:', error);
-        // Handle error
       }
+
+   
+    setTestlocation(newlocations);
+
+     // Calculate time difference for deadlines
+  const currentDate = new Date();
+  const currentHours = currentDate.getHours();
+  const currentMinutes = currentDate.getMinutes();
+  const currentTime = currentHours + currentMinutes / 60; // Convert current time to hours
+
+  const deadlines = places.map((place, index) => {
+    // Parse place time
+    const placeTimeParts = place.time.split(":");
+    const placeHours = parseInt(placeTimeParts[0]);
+    const placeMinutes = parseInt(placeTimeParts[1]);
+    const placeTimeInHours = placeHours + placeMinutes / 60;
+
+    // Calculate time difference in hours
+    return Math.abs(placeTimeInHours - currentTime); // Absolute difference in hours
+  });
+
+  deadlines.unshift(0);
+
+  setDeadline(deadlines);
+
     };
+
+
+    useEffect(() => {
+      newarr=optimizedLocations.slice(0, Math.ceil(optimizedLocations.length / 2));
+     console.log(newarr)
+   }, [optimizedLocations]);
+
+  //  useEffect(()=>{
+  //    console.log(testlocation);
+  //    console.log(deadline);
+  //  },[testlocation,deadline])
+
+  const fetchDirections = () => {
+    if (newarr.length < 2) {
+      return; // Not enough locations for directions
+    }
+  // eslint-disable-next-line no-undef
+    const origin = new google.maps.LatLng(newarr[0].lat, newarr[0].lng);
+     // eslint-disable-next-line no-undef
+    const destination = new google.maps.LatLng(newarr[newarr.length - 1].lat, newarr[newarr.length - 1].lng);
+    const waypoints = newarr.slice(1, -1).map(location => ({
+          // eslint-disable-next-line no-undef
+      location: new google.maps.LatLng(location.lat, location.lng),
+      stopover: true
+    }));
+  // eslint-disable-next-line no-undef
+    const directionsService = new google.maps.DirectionsService();
+    directionsService.route(
+      {
+        origin,
+        destination,
+        waypoints,
+            // eslint-disable-next-line no-undef
+        travelMode: google.maps.TravelMode.DRIVING
+      },
+      (result, status) => {
+            // eslint-disable-next-line no-undef
+        if (status === google.maps.DirectionsStatus.OK) {
+          setDirectionsResponse(result);
+        } else {
+          console.error('Directions request failed due to ' + status);
+          setDirectionsResponse(null);
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    if(!directionsResponse)
+    fetchDirections();
+  }, [optimizedLocations]);
 
     if (!isLoaded) {
       return (
@@ -186,6 +298,7 @@ const Showonmap = () => {
   const position = { lat: 19.1602, lng: 77.3102 };
   return (
     <>
+         <DistanceMatrix locations={{ location: testlocation, deadline: deadline }} setOptimizedLocations={setOptimizedLocations} />
       <div>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
@@ -282,7 +395,7 @@ const Showonmap = () => {
           }}
           onLoad={(map) => { setmap(map) }}
         >
-          <Marker position={currentPosition} />
+          {/* <Marker position={currentPosition} /> */}
           {clickedLatLng && <Marker position={clickedLatLng} />}
           <button className="btn btn-danger"
             style={{
@@ -326,7 +439,7 @@ const Showonmap = () => {
             </ul>
             {places.map((place,index) => (
               <>
-              <Marker key={index} position={place} />
+              {/* <Marker key={index} position={place} /> */}
               <ul
                 style={{
                   display: 'flex',
@@ -342,7 +455,19 @@ const Showonmap = () => {
               </>
             ))}
           </div>
+          {directionsResponse && (
+    <DirectionsRenderer
+      options={{
+        directions: directionsResponse,
+        panel: directionsPanel // Display textual directions in a panel
+      }}
+    />
+  )}
+          {markers.map((marker, index) => (
+            <Marker key={index} position={marker} />
+          ))}
         </GoogleMap>
+        <div ref={setDirectionsPanel} />
       </div>
     </>
   )
