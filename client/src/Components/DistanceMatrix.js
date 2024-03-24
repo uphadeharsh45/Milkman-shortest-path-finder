@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { GoogleMap, DirectionsService } from '@react-google-maps/api';
 
@@ -17,12 +18,12 @@ class PriorityQueue {
                 break;
             }
             else if (duration < this.queue[i].duration) {
-                this.queue.splice(i, 0, item);
+                this.queue.splice(i - 1, 0, item);
                 added = true;
                 break;
             }
             else if (distance < this.queue[i].distance) {
-                this.queue.splice(i, 0, item);
+                this.queue.splice(i - 1, 0, item);
                 added = true;
                 break;
             }
@@ -49,29 +50,17 @@ class PriorityQueue {
     }
 
     print() {
-        console.log(this.queue.map((item) => `${item.element} - ${item.priority}`).join('\n'));
+        // console.log(this.queue.map((item) => ${item.element} - ${item.priority}).join('\n'));
     }
 }
 
-// Example usage
-/*const pq = new PriorityQueue();
-pq.enqueue('A', 2);
-pq.enqueue('B', 1);
-pq.enqueue('C', 3);
-pq.print();*/
-// Output:
-// B - 1
-// A - 2
-// C - 3
-
-/*console.log('Dequeued:', pq.dequeue());
-pq.print();*/
-// Output:
-// A - 2
-// C - 3
 let final=[];
+async function main(location, data, deadline) {
 
-function main(location, data, deadline) {
+    //console.log(data)
+    //console.log(4);
+
+    //console.log(data[0][1], data[0][1][0], data[0][1][1]);
 
     const pq = new PriorityQueue();
 
@@ -85,14 +74,14 @@ function main(location, data, deadline) {
 
     let curTime = 0;
 
-    let order = new Array();
+    let order = [];
 
-    let notVis = new Array();
+    let notVis = [];
 
     while (!pq.isEmpty()) {
         let curStop = pq.peek();
         pq.dequeue();
-        if (vis[curStop.index] > 0 || vis[curStop.parent] == 2) {
+        if (vis[curStop.index] > 0 || vis[curStop.parent] === 2) {
             continue;
         }
         if (curTime + curStop.duration > deadline[curStop.index]) {
@@ -102,28 +91,36 @@ function main(location, data, deadline) {
         curTime = curTime + curStop.duration;
         vis[curStop.index] += 1;
         vis[curStop.parent] += 1;
+        //console.log(curStop.index);
         order.push(curStop.index);
         for (let i = 0; i < location.length; i++) {
-            if (i != curStop.index && !vis[i]) {
+            if (i !== curStop.index && !vis[i]) {
                 pq.enqueue(i, data[curStop.index][i][0], data[curStop.index][i][1], deadline[i], curStop.index);
             }
         }
     }
 
+    //console.log(notVis.length);
+
     for (let i = 0; i < notVis.length; i++) {
-        order.push(notVis[i]);
+        if (vis[notVis[i]] == 0) {
+            order.push(notVis[i]);
+            vis[notVis[i]] += 1;
+        }
     }
+
+    console.log(order);
 
     for (let i = 0; i < order.length; i++) {
         console.log(location[order[i]]);
         console.log(deadline[order[i]]);
+        console.log(data[0][order[i]][0]);
         final.push(location[order[i]]);
     }
 }
 
 function DistanceMatrix({ locations, setOptimizedLocations }) {
     const [distances, setDistances] = useState(null);
-    const [loc, setLoc] = useState([]);
 
     useEffect(() => {
         if (locations.location.length === 0) return;
@@ -144,93 +141,109 @@ function DistanceMatrix({ locations, setOptimizedLocations }) {
 
         const service = new window.google.maps.DistanceMatrixService();
 
-        for (let i = 0; i < origins.length; i++) {
-            for (let j = i + 1; j < origins.length; j++) {
-
-                if (i == j) {
-                    dataArr[i][j][0] = 0;
-                    dataArr[i][j][1] = 0;
-                }
-                else {
-                    service.getDistanceMatrix(
-                        {
-                            origins: [origins[i]],
-                            destinations: [origins[j]],
-                            travelMode: 'DRIVING', // Change this if you need other modes
-                        },
-                        (response, status) => {
-                            if (status === 'OK') {
-                                //setDistances(response);
-                                //console.log(response);
-                                let tStr = response.rows[0].elements[0].duration.text.split(" ");
-                                let dStr = response.rows[0].elements[0].distance.text.split(" ");
-                                let duration = 0;
-                                let distance = 0;
-                                for (let k = 0; k < tStr.length - 1; k++) {
-                                    if (tStr[k + 1] == "hours" || tStr[k + 1] == "hour") {
-                                        duration = duration + parseInt(tStr[i])
-                                    }
-                                    else if (tStr[i + 1] == "mins" || tStr[i + 1] == "min") {
-                                        duration = duration + (parseInt(tStr[i]) / 60)
-                                    }
-                                    else if (tStr[i + 1] == "secs" || tStr[i + 1] == "sec") {
-                                        duration = duration + (parseInt(tStr[i]) / 3600)
-                                    }
+        const f3 = (i, j) => {
+            return new Promise((resolve, reject) => {
+                service.getDistanceMatrix(
+                    {
+                        origins: [origins[i]],
+                        destinations: [origins[j]],
+                        travelMode: 'DRIVING', // Change this if you need other modes
+                    },
+                    (response, status) => {
+                        if (status === 'OK') {
+                            //setDistances(response);
+                            //console.log(response);
+                            let tStr = response.rows[0].elements[0].duration.text.split(" ");
+                            let dStr = response.rows[0].elements[0].distance.text.split(" ");
+                            //console.log(tStr, dStr)
+                            let duration = 0;
+                            let distance = 0;
+                            for (let k = 0; k < tStr.length - 1; k++) {
+                                if (tStr[k + 1] === "hours" || tStr[k + 1] === "hour") {
+                                    duration = duration + parseFloat(tStr[k])
                                 }
-                                for (let k = 0; k < dStr.length - 1; k++) {
-                                    if (dStr[k + 1] == "km") {
-                                        distance = distance + parseInt(dStr[i])
-                                    }
-                                    else if (dStr[i + 1] == "m") {
-                                        distance = distance + (parseInt(dStr[i]) / 1000)
-                                    }
-                                    else if (dStr[i + 1] == "cm") {
-                                        distance = distance + (parseInt(dStr[i]) / 1000000)
-                                    }
+                                else if (tStr[k + 1] === "mins" || tStr[k + 1] === "min") {
+                                    duration = duration + (parseFloat(tStr[k]) / 60)
                                 }
-                                dataArr[i][j][0] = duration;
-                                dataArr[i][j][1] = distance;
-                                dataArr[j][i][0] = duration;
-                                dataArr[j][i][1] = distance;
-                            } else {
-                                console.error('Error:', status);
+                                else if (tStr[k + 1] === "secs" || tStr[k + 1] === "sec") {
+                                    duration = duration + (parseFloat(tStr[k]) / 3600)
+                                }
                             }
+                            for (let k = 0; k < dStr.length - 1; k++) {
+                                if (dStr[k + 1] === "km") {
+                                    distance = distance + parseFloat(dStr[k])
+                                }
+                                else if (dStr[k + 1] === "m") {
+                                    distance = distance + (parseFloat(dStr[k]) / 1000)
+                                }
+                                else if (dStr[k + 1] === "cm") {
+                                    distance = distance + (parseFloat(dStr[k]) / 1000000)
+                                }
+                            }
+                            //console.log(1);
+                            resolve([duration, distance]);
+                            /*dataArr[i][j][0] = duration;
+                            dataArr[i][j][1] = distance;
+                            dataArr[j][i][0] = duration;
+                            dataArr[j][i][1] = distance;*/
+                            //console.log(dataArr[i][j][0], dataArr[i][j][1], dataArr[j][i][0], dataArr[j][i][1]);
+                        } else {
+                            console.error('Error:', status);
                         }
-                    );
-                }
-            }
+                    }
+                );
+            })
         }
 
-        
-         main(locations.location, dataArr, deadlines);
-         setOptimizedLocations(final);
-        //  const newarr=final.slice(0, Math.ceil(final.length / 2));
+        const f2 = () => {
+            return new Promise(async (resolve, reject) => {
+                for (let i = 0; i < origins.length; i++) {
+                    for (let j = i + 1; j < origins.length; j++) {
 
-        //  setOptimizedLocations(newarr);
-    // Set the optimized locations using the provided callback function
-    // setOptimizedLocations(locations);
+                        if (i === j) {
+                            dataArr[i][j][0] = 0;
+                            dataArr[i][j][1] = 0;
+                        }
+                        else {
+                            const m = await f3(i, j);
+                            dataArr[i][j][0] = m[0];
+                            dataArr[i][j][1] = m[1];
+                            dataArr[j][i][0] = m[0];
+                            dataArr[j][i][1] = m[1];
+                            //console.log(2);
+                        }
+                    }
+                }
+                resolve();
+            })
+        }
+
+        const f1 = async () => {
+            await f2();
+            //iconsole.log(3)
+            //console.log(dataArr[0][1], dataArr[0][1][0], dataArr[0][1][1]);
+           await main(locations.location, dataArr, deadlines);
+            setOptimizedLocations(final);
+        }
+
+        f1();
+
+       
     }, [locations]);
 
-    // useEffect(() => {
-    //     // Set optimizedLocations to half the length of the final array
-    //     setOptimizedLocations(final.slice(0, Math.ceil(final.length / 2)));
-    // }, [final, setOptimizedLocations]);
-// console.log(loc)
-// console.log(final);
-
-return null
+    return null;
     // return (
-    //     // <div>
-    //     //     {/* {distances && distances.rows.map((row, i) => (
-    //     //         <div key={i}>
-    //     //             {row.elements.map((element, j) => (
-    //     //                 <div key={j}>
-    //     //                     Distance from {locations.location[i].name} to {locations.location[j].name}: {element.distance.text}, Duration: {element.duration.text}
-    //     //                 </div>
-    //     //             ))}
-    //     //         </div>
-    //     //     ))} */}
-    //     // </div>
+    //     <div>
+    //         {distances && distances.rows.map((row, i) => (
+    //             <div key={i}>
+    //                 {row.elements.map((element, j) => (
+    //                     <div key={j}>
+    //                         Distance from {locations.location[i].name} to {locations.location[j].name}: {element.distance.text}, Duration: {element.duration.text}
+    //                     </div>
+    //                 ))}
+    //             </div>
+    //         ))}
+    //     </div>
     // );
 }
 

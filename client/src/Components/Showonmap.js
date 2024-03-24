@@ -137,19 +137,9 @@ const Showonmap = () => {
     // console.log(clickedLatLng); 
   };
 
-  // useEffect(() => {
-  //   // console.log(clickedLatLng);
-  //   console.log(temp);
-  // }, [clickedLatLng]);
+ 
 
   const handleadd =async () => {
-    // Perform validation if needed
-    // console.log(temp); // Here you have access to the complete temp object with all values
-    // setPlaces(prevPlaces => {
-    //   const newPlaces =  [...prevPlaces, temp];
-    //   // console.log("New places:", newPlaces);
-    //   return newPlaces;
-    // });
 
     const updatedLocations = [...places, temp];
 
@@ -160,7 +150,7 @@ const Showonmap = () => {
     setPlaces(updatedLocations);
 
     settemp(prevTemp => ({ ...prevTemp, name: "" }));
-    // console.log(places) // Add temp to the places array
+
   };
 
   // useEffect(() => {
@@ -176,27 +166,7 @@ const Showonmap = () => {
     // Function to handle the "Calculate Route" button click event
     const handleCalculateRoute = async () => {
       clearMarkers();
-      // try {
-      //   // Make an HTTP POST request using the Fetch API
-      //   const response = await fetch('http://localhost:5000/api/routes/addroute', {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //       "auth-token": localStorage.getItem('token')
-
-      //     },
-      //     body: JSON.stringify({
-           
-      //       locations: places // Pass the places array to be added to the route
-      //     }),
-      //   });
-      //   const data = await response.json();
-      //   console.log('Route added successfully:', data);
-      //   // Handle success or redirect to another page if needed
-      // } catch (error) {
-      //   console.error('Error adding route:', error);
-      //   // Handle error
-      // }
+    
 
       const newlocations = places.map(place => ({
         lat: place.lat,
@@ -249,14 +219,14 @@ const Showonmap = () => {
   //  },[testlocation,deadline])
 
   const fetchDirections = () => {
-    if (newarr.length < 2) {
+    if (optimizedLocations.length < 2) {
       return; // Not enough locations for directions
     }
   // eslint-disable-next-line no-undef
-    const origin = new google.maps.LatLng(newarr[0].lat, newarr[0].lng);
+    const origin = new google.maps.LatLng(optimizedLocations[0].lat, optimizedLocations[0].lng);
      // eslint-disable-next-line no-undef
-    const destination = new google.maps.LatLng(newarr[newarr.length - 1].lat, newarr[newarr.length - 1].lng);
-    const waypoints = newarr.slice(1, -1).map(location => ({
+    const destination = new google.maps.LatLng(optimizedLocations[optimizedLocations.length - 1].lat, optimizedLocations[optimizedLocations.length - 1].lng);
+    const waypoints = optimizedLocations.slice(1, -1).map(location => ({
           // eslint-disable-next-line no-undef
       location: new google.maps.LatLng(location.lat, location.lng),
       stopover: true
@@ -334,12 +304,9 @@ const Showonmap = () => {
                   </li>
 
                   <li className="nav-item mx-2">
-                    {/* <Link className='btn btn-danger mx-2' to='' role='button'>Login</Link> */}
                     <button className='btn btn-danger mx-2' onClick={handleLogout}>Logout</button>
                   </li>
-                  {/* <li className="nav-item">
-                    <Link className='btn btn-danger mx-2' to='/signup' role='button'>Signup</Link>
-                  </li> */}
+                
                 </ul>
               </form>
             </div>
