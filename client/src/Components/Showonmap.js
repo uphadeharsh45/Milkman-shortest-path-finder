@@ -233,7 +233,8 @@ const Showonmap = () => {
   deadlines.unshift(0);
 
   setDeadline(deadlines);
-
+  document.getElementById('directionbox').style.visibility='visible';
+    document.getElementById('customers').style.visibility='hidden';
     };
 
 
@@ -410,7 +411,7 @@ const Showonmap = () => {
           >
             Return
           </button>
-          <div className="container-fluid"
+          <div className="container-fluid" id='customers'
             style={{
               position: 'absolute',
               top: '10vh',
@@ -466,8 +467,20 @@ const Showonmap = () => {
           {markers.map((marker, index) => (
             <Marker key={index} position={marker} />
           ))}
+        <div ref={setDirectionsPanel} id='directionbox' style={{
+              position: 'absolute',
+              top: '10vh',
+              left: '1vw',
+              width: '17vw',
+              height:'35vw',
+              zIndex: '9999',
+              backgroundColor: '#e4e4e4',
+              padding: '10px',
+              borderRadius: '1vh',
+              overflow:'scroll',
+              visibility:'hidden'
+            }}/>
         </GoogleMap>
-        <div ref={setDirectionsPanel} />
       </div>
     </>
   )
