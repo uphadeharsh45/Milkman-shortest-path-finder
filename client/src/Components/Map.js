@@ -214,14 +214,14 @@ const Map = () => {
     },[testlocation,deadline])
 
     const fetchDirections = () => {
-      if (newarr.length < 2) {
+      if (optimizedLocations.length < 2) {
         return; // Not enough locations for directions
       }
     // eslint-disable-next-line no-undef
-      const origin = new google.maps.LatLng(newarr[0].lat, newarr[0].lng);
+      const origin = new google.maps.LatLng(optimizedLocations[0].lat, optimizedLocations[0].lng);
        // eslint-disable-next-line no-undef
-      const destination = new google.maps.LatLng(newarr[newarr.length - 1].lat, newarr[newarr.length - 1].lng);
-      const waypoints = newarr.slice(1, -1).map(location => ({
+      const destination = new google.maps.LatLng(optimizedLocations[optimizedLocations.length - 1].lat, optimizedLocations[optimizedLocations.length - 1].lng);
+      const waypoints = optimizedLocations.slice(1, -1).map(location => ({
             // eslint-disable-next-line no-undef
         location: new google.maps.LatLng(location.lat, location.lng),
         stopover: true
