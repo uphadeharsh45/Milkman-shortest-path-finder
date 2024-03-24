@@ -26,7 +26,8 @@ const Map = () => {
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [directionsPanel, setDirectionsPanel] = useState(null);
-
+  // const [calculatebox,setcalculatebox]=useState(false);
+  // let screenwidth=window.innerWidth<768;
 
   let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
   let navigate=useNavigate();
@@ -176,7 +177,9 @@ const Map = () => {
 
    
     setTestlocation(newlocations);
-
+    // setcalculatebox(true);
+    document.getElementById('directionbox').style.visibility='visible';
+    document.getElementById('customers').style.visibility='hidden';
      // Calculate time difference for deadlines
   const currentDate = new Date();
   const currentHours = currentDate.getHours();
@@ -371,7 +374,7 @@ const Map = () => {
           >
             Return
           </button>
-          <div className="container-fluid"
+          <div className="container-fluid" id='customers'
             style={{
               position: 'absolute',
               top: '10vh',
@@ -382,9 +385,6 @@ const Map = () => {
               padding: '10px',
               borderRadius: '1vh'
             }}>
-            <div className="container mx-2">
-              {places.length === 0 && 'No destinations to Display'}
-            </div>
             <ul
               style={{
                 display: 'flex',
@@ -398,6 +398,9 @@ const Map = () => {
               <li className='nav-item'>Name</li>
               <li className='nav-item'>Time</li>
             </ul>
+                <div className="container mx-2">
+                  {places.length === 0 && 'No destinations to Display'}
+                </div>
             {places.map((place,index) => (
               <>
               {/* <Marker key={index} position={place} /> */}
@@ -427,8 +430,21 @@ const Map = () => {
    {markers.map((marker, index) => (
           <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} />
         ))}
+        <div ref={setDirectionsPanel} id='directionbox' style={{
+              position: 'absolute',
+              top: '10vh',
+              left: '1vw',
+              width: '17vw',
+              height:'35vw',
+              zIndex: '9999',
+              backgroundColor: '#e4e4e4',
+              padding: '10px',
+              borderRadius: '1vh',
+              overflow:'scroll',
+              visibility:'hidden'
+            }}/>
         </GoogleMap>
-        <div ref={setDirectionsPanel} />
+        {/* {!screenwidth &&<div ref={setDirectionsPanel}/>} */}
       </div>
     </>
   )
