@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useJsApiLoader, GoogleMap, Marker, Autocomplete ,DirectionsRenderer,InfoWindow} from '@react-google-maps/api'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
-// import Spinner from './Spinner';
+import Spinner from './Spinner';
 import { useLocation } from 'react-router-dom'
 import { useContext } from 'react';
 import routeContext from '../context/routes/routeContext';
 import DistanceMatrix from './DistanceMatrix';
-
+import LoadingBar from 'react-top-loading-bar';
 
 const libraries = ['places','directions'];
 const Showonmap = () => {
@@ -37,6 +37,8 @@ const Showonmap = () => {
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [directionsPanel, setDirectionsPanel] = useState(null);
   const [selectedMarker,setSelectedMarker]=useState("");
+  const [progress,setProgress]=useState(0)
+  const [loading, setLoading] = useState(false); 
 
 
   let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
@@ -158,8 +160,8 @@ const Showonmap = () => {
 
   const handleCalculateRoute = async () => {
       clearMarkers();
-    
-
+      setLoading(true);
+      setProgress(30);
       const newlocations = places.map(place => ({
         lat: place.lat,
         lng: place.lng
@@ -207,6 +209,7 @@ const Showonmap = () => {
 
 
   const fetchDirections = () => {
+    // setProgress(30);
     if (optimizedLocations.length < 2) {
       return; // Not enough locations for directions
     }
@@ -233,6 +236,8 @@ const Showonmap = () => {
             // eslint-disable-next-line no-undef
         if (status === google.maps.DirectionsStatus.OK) {
           setDirectionsResponse(result);
+          setProgress(100);
+          setLoading(false);
         } else {
           console.error('Directions request failed due to ' + status);
           setDirectionsResponse(null);
@@ -248,6 +253,7 @@ const Showonmap = () => {
 
 
     if (!isLoaded) {
+      
       return (
         <div className="container" style={{marginTop:'25%'}}>
           {/* <Spinner/> */}
@@ -336,6 +342,15 @@ const Showonmap = () => {
             </div>
           </div>
         </div>
+      </div>
+      <LoadingBar
+        color='#f11946'
+        progress={progress}
+        shadow={true}
+      />
+      {/* <Spinner/> */}
+      <div className="spinner-container" style={{ display: loading ? 'flex' : 'none' }}>
+        <Spinner />
       </div>
       <div style={{ height: '94vh' }}>
         <GoogleMap

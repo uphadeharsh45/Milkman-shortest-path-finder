@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
 import DistanceMatrix from './DistanceMatrix';
-
+import LoadingBar from 'react-top-loading-bar';
 
 const libraries = ['places','directions'];
 const Map = () => {
@@ -27,6 +27,8 @@ const Map = () => {
   const [markers, setMarkers] = useState([]);
   const [directionsPanel, setDirectionsPanel] = useState(null);
   const [selectedMarker,setSelectedMarker]=useState("");
+  const [progress,setProgress]=useState(0)
+  const [loading, setLoading] = useState(false); 
 
   // const [calculatebox,setcalculatebox]=useState(false);
   // let screenwidth=window.innerWidth<768;
@@ -147,6 +149,8 @@ const Map = () => {
 
     const handleCalculateRoute = async () => {
       clearMarkers();
+      setLoading(true);
+      setProgress(30);
       try {
         const response = await fetch('http://localhost:5000/api/routes/addroute', {
           method: 'POST',
@@ -242,6 +246,8 @@ const Map = () => {
               // eslint-disable-next-line no-undef
           if (status === google.maps.DirectionsStatus.OK) {
             setDirectionsResponse(result);
+            setProgress(100);
+            setLoading(false);
           } else {
             console.error('Directions request failed due to ' + status);
             setDirectionsResponse(null);
@@ -347,6 +353,17 @@ const Map = () => {
           </div>
         </div>
       </div>
+
+      <LoadingBar
+        color='#f11946'
+        progress={progress}
+        shadow={true}
+      />
+      {/* <Spinner/> */}
+      <div className="spinner-container" style={{ display: loading ? 'flex' : 'none' }}>
+        <Spinner />
+      </div>
+
       <div style={{ height: '94vh' }}>
         <GoogleMap
           onClick={mapClicked}
@@ -433,7 +450,7 @@ const Map = () => {
            <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} onClick={()=>{setSelectedMarker(marker)}} />
         ))}
         {selectedMarker && (
-          <InfoWindow position={{lat:selectedMarker.lat,lng:selectedMarker.lng}} onCloseClick={(e)=>{setSelectedMarker(null)}} zIndex={999} >
+          <InfoWindow position={{lat:selectedMarker.lat,lng:selectedMarker.lng}} onCloseClick={(e)=>{setSelectedMarker(null)}} zIndex={999} key={selectedMarker.name} >
             <div>{selectedMarker.name}</div>
           </InfoWindow>
         )}
