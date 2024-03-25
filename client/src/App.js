@@ -30,6 +30,10 @@ function App() {
      <RoutesState>
       <BrowserRouter>
       {/* <Alert alert={alert}/> */}
+      {/* {alert && <Alert alert={alert} />}  */}
+      <div className="alert-container">
+            {alert && <Alert alert={alert} />} {/* Render the Alert component */}
+          </div>
         <div className="container-1">
           <Routes>
             <Route exact path="/login" element={<Login showAlert={showAlert}/>} />
