@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useJsApiLoader, GoogleMap, Marker, Autocomplete ,DirectionsRenderer} from '@react-google-maps/api'
+import { useJsApiLoader, GoogleMap, Marker, Autocomplete ,DirectionsRenderer,InfoWindow} from '@react-google-maps/api'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
-// import Spinner from './Spinner';
 // import Spinner from './Spinner';
 import { useLocation } from 'react-router-dom'
 import { useContext } from 'react';
@@ -37,8 +36,7 @@ const Showonmap = () => {
   const [deadline,setDeadline]=useState([]);
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [directionsPanel, setDirectionsPanel] = useState(null);
-  
-
+  const [selectedMarker,setSelectedMarker]=useState("");
 
 
   let fontSize = window.innerWidth < 590 ? '2vw' : '15px';
@@ -52,7 +50,7 @@ const Showonmap = () => {
         position => {
           const { latitude, longitude } = position.coords;
           setCurrentPosition({ lat: latitude, lng: longitude });
-          setMarkers(prevMarkers => [...prevMarkers, { lat: latitude, lng: longitude }]);
+          setMarkers(prevMarkers => [...prevMarkers, {name:"Current Loc", lat: latitude, lng: longitude }]);
 
         },
         error => {
@@ -78,7 +76,7 @@ const Showonmap = () => {
 
   useEffect(() => {
     // Update markers when places change
-    setMarkers(places.map(place => ({ lat: place.lat, lng: place.lng })));
+    setMarkers(places.map(place => ({name:place.name, lat: place.lat, lng: place.lng })));
   }, [places]);
 
   const handleLogout =()=>{
@@ -153,18 +151,12 @@ const Showonmap = () => {
 
   };
 
-  // useEffect(() => {
-  //   // console.log(clickedLatLng);
-  //   console.log(places);
-  // }, [places]);
 
   const clearMarkers = () => {
     setMarkers([]); // Clear the markers array
   };
 
-
-    // Function to handle the "Calculate Route" button click event
-    const handleCalculateRoute = async () => {
+  const handleCalculateRoute = async () => {
       clearMarkers();
     
 
@@ -183,13 +175,13 @@ const Showonmap = () => {
    
     setTestlocation(newlocations);
 
-     // Calculate time difference for deadlines
-  const currentDate = new Date();
-  const currentHours = currentDate.getHours();
-  const currentMinutes = currentDate.getMinutes();
-  const currentTime = currentHours + currentMinutes / 60; // Convert current time to hours
+  // Calculate time difference for deadlines
+    const currentDate = new Date();
+    const currentHours = currentDate.getHours();
+    const currentMinutes = currentDate.getMinutes();
+    const currentTime = currentHours + currentMinutes / 60; // Convert current time to hours
 
-  const deadlines = places.map((place, index) => {
+    const deadlines = places.map((place, index) => {
     // Parse place time
     const placeTimeParts = place.time.split(":");
     const placeHours = parseInt(placeTimeParts[0]);
@@ -202,21 +194,17 @@ const Showonmap = () => {
 
   deadlines.unshift(0);
 
-  setDeadline(deadlines);
-  document.getElementById('directionbox').style.visibility='visible';
+    setDeadline(deadlines);
+    document.getElementById('directionbox').style.visibility='visible';
     document.getElementById('customers').style.visibility='hidden';
     };
 
 
-    useEffect(() => {
+  useEffect(() => {
       newarr=optimizedLocations.slice(0, Math.ceil(optimizedLocations.length / 2));
      console.log(newarr)
-   }, [optimizedLocations]);
+    }, [optimizedLocations]);
 
-  //  useEffect(()=>{
-  //    console.log(testlocation);
-  //    console.log(deadline);
-  //  },[testlocation,deadline])
 
   const fetchDirections = () => {
     if (optimizedLocations.length < 2) {
@@ -258,6 +246,7 @@ const Showonmap = () => {
     fetchDirections();
   }, [optimizedLocations]);
 
+
     if (!isLoaded) {
       return (
         <div className="container" style={{marginTop:'25%'}}>
@@ -266,7 +255,6 @@ const Showonmap = () => {
       )
     }
 
-  const position = { lat: 19.1602, lng: 77.3102 };
   return (
     <>
          <DistanceMatrix locations={{ location: testlocation, deadline: deadline }} setOptimizedLocations={setOptimizedLocations} />
@@ -431,9 +419,15 @@ const Showonmap = () => {
       }}
     />
   )}
-          {markers.map((marker, index) => (
-            <Marker key={index} position={marker} />
-          ))}
+        {markers.map((marker, index) => (
+           <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} onClick={()=>{setSelectedMarker(marker)}} />
+        ))}
+        {selectedMarker && (
+          <InfoWindow position={{lat:selectedMarker.lat,lng:selectedMarker.lng}}>
+            <div>{selectedMarker.name}</div>
+          </InfoWindow>
+        )}
+         
         <div ref={setDirectionsPanel} id='directionbox' style={{
               position: 'absolute',
               top: '10vh',
