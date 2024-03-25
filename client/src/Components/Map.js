@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useJsApiLoader, GoogleMap, Marker, Autocomplete,DirectionsService, DirectionsRenderer } from '@react-google-maps/api'
+import { useJsApiLoader, GoogleMap, Marker, Autocomplete,DirectionsService, DirectionsRenderer,InfoWindow } from '@react-google-maps/api'
 import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
@@ -26,6 +26,8 @@ const Map = () => {
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [directionsPanel, setDirectionsPanel] = useState(null);
+  const [selectedMarker,setSelectedMarker]=useState("");
+
   // const [calculatebox,setcalculatebox]=useState(false);
   // let screenwidth=window.innerWidth<768;
 
@@ -40,7 +42,7 @@ const Map = () => {
         position => {
           const { latitude, longitude } = position.coords;
           setCurrentPosition({ lat: latitude, lng: longitude });
-          setMarkers(prevMarkers => [...prevMarkers, { lat: latitude, lng: longitude }]);
+          setMarkers(prevMarkers => [...prevMarkers, {name:"current loc", lat: latitude, lng: longitude }]);
           console.log(currentPosition);
         },
         error => {
@@ -131,7 +133,7 @@ const Map = () => {
       // console.log("New places:", newPlaces);
       return newPlaces;
     });
-    setMarkers(prevMarkers => [...prevMarkers,{ lat: temp.lat, lng: temp.lng } ]);
+    setMarkers(prevMarkers => [...prevMarkers,{name:temp.name, lat: temp.lat, lng: temp.lng } ]);
     settemp(prevTemp => ({ ...prevTemp, name: "" }));
     // console.log(places) // Add temp to the places array
   };
@@ -427,9 +429,15 @@ const Map = () => {
       }}
     />
   )}
-   {markers.map((marker, index) => (
-          <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} />
+    {markers.map((marker, index) => (
+           <Marker key={index} position={{ lat: marker.lat, lng: marker.lng }} onClick={()=>{setSelectedMarker(marker)}} />
         ))}
+        {selectedMarker && (
+          <InfoWindow position={{lat:selectedMarker.lat,lng:selectedMarker.lng}} onCloseClick={(e)=>{setSelectedMarker(null)}} zIndex={999} >
+            <div>{selectedMarker.name}</div>
+          </InfoWindow>
+        )}
+         
         <div ref={setDirectionsPanel} id='directionbox' style={{
               position: 'absolute',
               top: '10vh',
