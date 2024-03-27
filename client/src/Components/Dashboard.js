@@ -81,7 +81,7 @@ function Dashboard() {
           </Link>
           </div>
           <div className="col-md-4 my-5">
-          <Link className="navbar-brand" to="/showroute">
+          <Link className="navbar-brand" to="/routewithouttime">
             <div className="card text-center" style={{boxShadow: '0 0 10px red',border:'0px solid black', borderRadius:'3vh',backgroundColor:'#e4e4e4'}}>
               <div className="card-body">
                 <img src={timeimage} alt="Saved Routes" className="img-fluid mb-3" style={{width:'50%'}} />
