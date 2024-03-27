@@ -1,13 +1,13 @@
 import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import plus from './plus.png'
-import saved_routes from './saved_routes.png'
-import timeimage from './images.png'
+import plus from './plus2.png'
+import saved_routes from './savedroutes2.png'
+import timeimage from './timeimage3.png'
 import { useEffect } from 'react'
 // import background_image from './background_image.webp'
 
 function Dashboard() {
-
+  document.body.style.backgroundColor='black';
   const navigate=useNavigate();
 
   useEffect(() => {
@@ -62,7 +62,7 @@ function Dashboard() {
         <div className="row justify-content-center gx-5">
           <div className="col-md-4 my-5">
           <Link className="navbar-brand" to="/map">
-            <div className="card text-center" style={{boxShadow: '0 0 10px red',border:'0px solid black', borderRadius:'3vh',backgroundColor:'#e4e4e4'}}>
+            <div className="card text-center" style={{boxShadow: '0 0 10px red',border:'0px solid black', borderRadius:'3vh',backgroundColor:'#1f1c1c',color:'white'}}>
               <div className="card-body">
                 <img src={plus} alt="Add Destinations" className="img-fluid mb-3" style={{width:'50%'}} />
                 <h5 className="card-title">Add New Routes</h5>
@@ -72,7 +72,7 @@ function Dashboard() {
           </div>
           <div className="col-md-4 my-5">
           <Link className="navbar-brand" to="/showroute">
-            <div className="card text-center" style={{boxShadow: '0 0 10px red',border:'0px solid black', borderRadius:'3vh',backgroundColor:'#e4e4e4'}}>
+            <div className="card text-center" style={{boxShadow: '0 0 10px red',border:'0px solid black', borderRadius:'3vh',backgroundColor:'#1f1c1c',color:'white'}}>
               <div className="card-body">
                 <img src={saved_routes} alt="Saved Routes" className="img-fluid mb-3" style={{width:'50%'}} />
                 <h5 className="card-title">View Saved Routes</h5>
@@ -82,7 +82,7 @@ function Dashboard() {
           </div>
           <div className="col-md-4 my-5">
           <Link className="navbar-brand" to="/routewithouttime">
-            <div className="card text-center" style={{boxShadow: '0 0 10px red',border:'0px solid black', borderRadius:'3vh',backgroundColor:'#e4e4e4'}}>
+            <div className="card text-center" style={{boxShadow: '0 0 10px red',border:'0px solid black', borderRadius:'3vh',backgroundColor:'#1f1c1c',color:'white'}}>
               <div className="card-body">
                 <img src={timeimage} alt="Saved Routes" className="img-fluid mb-3" style={{width:'50%'}} />
                 <h5 className="card-title">Add Route Without Time</h5>
