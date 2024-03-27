@@ -13,6 +13,7 @@ import Map from './Components/Map';
 import ShowRoute from './Components/ShowRoute';
 import RoutesState from './context/routes/RoutesState';
 import Showonmap from './Components/Showonmap';
+import RouteWithoutTime from './Components/RouteWithoutTime';
 
 function App() {
   const[alert,setAlert]=useState(null);
@@ -42,6 +43,7 @@ function App() {
             <Route exact path="/map" element={<Map showAlert={showAlert}/>} />
             <Route exact path="/showroute" element={<ShowRoute showAlert={showAlert}/>} />
             <Route exact path="/showonmap" element={<Showonmap showAlert={showAlert}/>} />
+            <Route exact path="/routewithouttime" element={<RouteWithoutTime showAlert={showAlert}/>} />
           </Routes>
         </div>
       </BrowserRouter>
