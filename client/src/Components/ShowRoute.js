@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import routeContext from '../context/routes/routeContext';
 
 
-const ShowRoute = () => {
+const ShowRoute = (props) => {
 
   const navigate = useNavigate();
   const context = useContext(routeContext);
@@ -44,6 +44,7 @@ const ShowRoute = () => {
   const handleEditCustomer=()=>{
     updateTime(routeIdtoUpdate,custIdtoUpdate,newTime);
     setNewTime('');
+    props.showAlert("Deadline updated successfully !","success")
   }
 
   // const showroute=(index)=>{
@@ -90,7 +91,7 @@ const ShowRoute = () => {
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">Add New Place</h1>
+              <h1 className="modal-title fs-5" id="exampleModalLabel">Update Customer Deadline</h1>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div className="modal-body">
@@ -116,7 +117,7 @@ const ShowRoute = () => {
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleEditCustomer}>Edit Customer</button>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleEditCustomer}>Update Deadline</button>
             </div>
           </div>
         </div>
@@ -125,7 +126,7 @@ const ShowRoute = () => {
       <div className="container" style={{ padding: '2vw' }}>
         {routes.map((index, arrayindex) => (
           <div style={{padding:'1vw'}}>
-            <h3>{`Route ${arrayindex + 1}`}<i className="fa-solid fa-trash mx-5" onClick={()=>{deleteRoute(index._id)}}></i><button className="btn btn-danger" type="submit" onClick={() => showroute(index._id, index.locations)}>Show Route</button></h3>
+            <h3>{`Route ${arrayindex + 1}`}<i className="fa-solid fa-trash mx-5" onClick={()=>{deleteRoute(index._id);props.showAlert("Route deleted successfully !","success")}}></i><button className="btn btn-danger" type="submit" onClick={() => showroute(index._id, index.locations)}>Show Route</button></h3>
             <table className='table table-bordered table-dark' id={index} >
               <thead>
                 <tr>
@@ -138,7 +139,7 @@ const ShowRoute = () => {
               {index.locations.map((place) => (
                 <tbody>
                   <tr>
-                    <td className='table-sm'><i className="fa-solid fa-trash mx-2" onClick={()=>{deleteCustomer(index._id,place._id)}}></i></td>
+                    <td className='table-sm'><i className="fa-solid fa-trash mx-2" onClick={()=>{deleteCustomer(index._id,place._id);props.showAlert("Customer Deleted successfully !","success")}}></i></td>
                     <td ><i className="fa-solid fa-pen mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onClick={()=>{setCustIdtoUpdate(place._id);setRouteIdtoUpdate(index._id)}} ></i></td>
                     <td >{place.name}</td>
                     <td >{place.time}</td>
