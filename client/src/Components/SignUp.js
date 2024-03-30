@@ -12,7 +12,11 @@ const SignUp = (props) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password } = credentials
+    const { name, email, password,cpassword } = credentials
+    if (password !== cpassword) {
+      props.showAlert("Passwords do not match", "danger");
+      return;
+    }
     const response = await fetch(`http://localhost:5000/api/auth/createuser`, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
 

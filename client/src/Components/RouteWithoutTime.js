@@ -9,7 +9,7 @@ import { fetchOptimizedRoute } from './fetchOptimizedRoute';
 const libraries = ['places','directions'];
 const RouteWithoutTime = () => {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyDxgAdwDaCyixQZ-GHZRxejom_NGRQ4s8M',
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: libraries
   })
   const [places, setPlaces] = useState([]);
@@ -57,7 +57,7 @@ const RouteWithoutTime = () => {
 
   useEffect(() => {
     if(localStorage.getItem('token')){
-        console.log(localStorage.getItem('token'))
+        // console.log(localStorage.getItem('token'))
     }
     else{
       console.log("logging in .....")

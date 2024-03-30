@@ -9,7 +9,7 @@ import LoadingBar from 'react-top-loading-bar';
 const libraries = ['places','directions'];
 const Map = () => {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyDxgAdwDaCyixQZ-GHZRxejom_NGRQ4s8M',
+    googleMapsApiKey:process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: libraries
   })
   let newarr=[]
@@ -58,7 +58,7 @@ const Map = () => {
 
   useEffect(() => {
     if(localStorage.getItem('token')){
-        console.log(localStorage.getItem('token'))
+        // console.log(localStorage.getItem('token'))
     }
     else{
       console.log("logging in .....")
@@ -348,7 +348,7 @@ const Map = () => {
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleadd}>Add Customer</button>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleadd} disabled={!temp.name || !temp.time}>Add Customer</button>
             </div>
           </div>
         </div>
