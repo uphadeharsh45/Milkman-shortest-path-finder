@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
 import DistanceMatrix from './DistanceMatrix';
 import LoadingBar from 'react-top-loading-bar';
+import { SMS } from './SMS';
 
 const libraries = ['places','directions'];
 const Map = () => {
@@ -16,7 +17,7 @@ const Map = () => {
   const [places, setPlaces] = useState([]);
   const [map, setmap] = useState(/** @type google.maps.Map */(null))
   const [searchPosition, setSearchPosition] = useState(null);
-  const [temp, settemp] = useState({ name: "", lat: "", lng: "", time: "" })
+  const [temp, settemp] = useState({ name: "", lat: "", lng: "", time: "",phoneNumber:"" })
   const autocompleteRef = useRef(null);
   const [clickedLatLng, setClickedLatLng] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(null);
@@ -71,6 +72,7 @@ const Map = () => {
     localStorage.removeItem('token');
     navigate("/login");
   }
+
 
 
   const handleAutocompleteLoad = (autocomplete) => {
@@ -129,6 +131,10 @@ const Map = () => {
   }, [clickedLatLng]);
 
   const handleadd = () => {
+    if (temp.phoneNumber.length !== 10) {
+      alert('Please enter a 10-digit phone number');
+      return;
+    }
     console.log(temp); // Here you have access to the complete temp object with all values
     setPlaces(prevPlaces => {
       const newPlaces = [...prevPlaces, temp];
@@ -261,6 +267,47 @@ const Map = () => {
       fetchDirections();
     }, [optimizedLocations]);
 
+    const matchPlacesWithOptimizedLocations = (optimizedLocations, places) => {
+      return optimizedLocations.map(optLocation => {
+        const matchedPlace = places.find(place => 
+          place.lat === optLocation.lat && place.lng === optLocation.lng
+        );
+        return {
+          ...optLocation,
+          name: matchedPlace ? matchedPlace.name : "Unknown",
+          phoneNumber:matchedPlace?'+91'+matchedPlace.phoneNumber:"Unknown" // Add customer name or use a default value
+          // Add other properties from matchedPlace as needed
+        };
+      });
+    };
+
+    const sendSMS1 = async () => {
+      const deliveryTimes = [];
+      if (directionsResponse && directionsResponse.routes && directionsResponse.routes.length > 0) {
+        const route = directionsResponse.routes[0]; // Assuming there's only one route
+        route.legs.forEach((leg, index) => {
+          const arrivalTime = new Date(Date.now() + leg.duration.value * 1000); // Convert duration to milliseconds
+          deliveryTimes.push(arrivalTime);
+        });
+      }
+    
+      const matchedPlaces = matchPlacesWithOptimizedLocations(optimizedLocations, places);
+    
+      const oneThirdLength = Math.ceil(matchedPlaces.length / 3);
+      const slicedArray = matchedPlaces.slice(0, oneThirdLength);
+      const SMSarray = slicedArray.slice(1).map((place, index) => ({
+        ...place,
+        deliveryTime: deliveryTimes[index].toString(), // Assuming deliveryTimes and matchedPlaces are of the same length
+      }));
+    
+      // Iterate over SMSarray and send SMS for each customer using for...of loop
+      for (const customer of SMSarray) {
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for 3 seconds
+        SMS(customer.phoneNumber, `Your delivery time is ${customer.deliveryTime}`);
+      }
+    }
+    
+
     if (!isLoaded) {
       return (
         <div className="container" style={{marginTop:'25%'}}>
@@ -277,7 +324,7 @@ const Map = () => {
       <div>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
-            <Link className="navbar-brand" to="/">Uphade Routes</Link>
+            <Link className="navbar-brand" to="/">RouteMaster</Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span className="navbar-toggler-icon"></span>
             </button>
@@ -309,6 +356,9 @@ const Map = () => {
 
                   <li className="nav-item mx-2">
                     <button className='btn btn-danger mx-2' onClick={handleLogout}>Logout</button>
+                  </li>
+                  <li className="nav-item mx-2">
+                    <button className='btn btn-danger mx-2' onClick={sendSMS1}>SMS</button>
                   </li>
                
                 </ul>
@@ -342,13 +392,18 @@ const Map = () => {
                       backgroundColor: '#e4e4e4',
                       color: 'black',
                       cursor: 'pointer'
-                    }} />
+                    }} 
+                    />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="recipient-number" className="col-form-label">Phone Number:</label>
+                  <input type="text" className="form-control" id="recipient-number" style={{ backgroundColor: '#e4e4e4', border: '1px solid black' }} value={temp.phoneNumber} onChange={(e) => settemp({ ...temp, phoneNumber: e.target.value })} />
                 </div>
               </form>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleadd} disabled={!temp.name || !temp.time}>Add Customer</button>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleadd} disabled={!temp.name || !temp.time || !clickedLatLng}>Add Customer</button>
             </div>
           </div>
         </div>
