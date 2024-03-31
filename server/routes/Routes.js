@@ -3,6 +3,16 @@ const router = express.Router();
 var fetchuser = require('../middleware/fetchuser');
 const Routes = require('../models/Route');
 const { body, validationResult } = require('express-validator');
+const twilio=require('twilio');
+const accountSid = 'AC4b95f855eba1ce9560cda049dcc020ff';
+const authToken = '6e537de20bde967f01c66a0f5c693d0b';
+const twilioPhoneNumber = '+12513175211';
+// const accountSid = process.env.TWILIO_ACC_SID;
+// const authToken = process.env.TWILIO_ATUH_TOKEN;
+// const twilioPhoneNumber =process.env.TWILIO_PH;
+
+const client = twilio(accountSid, authToken);
+// const client = twilio(process.env.TWILIO_ACC_SID, process.env.TWILIO_ATUH_TOKEN);
 
 
 // Route 1 : Get all the routes using GET "/api/notes/fetchallnotes".Login required.
@@ -146,6 +156,27 @@ router.put('/updatetime/:routeId/:customerId',fetchuser, async (req, res) => {
       res.status(500).json({ message: 'Internal Server Error' });
     }
   });
+
+
+  router.post('/send-sms', async (req, res) => {
+    const { to, message } = req.body;
+  
+    try {
+      // Send SMS using Twilio
+      const result = await client.messages.create({
+        body: message,
+        from: twilioPhoneNumber,
+        to: to
+      });
+  
+      console.log('SMS sent successfully:', result.sid);
+      res.json({ success: true, message: 'SMS sent successfully' });
+    } catch (error) {
+      console.error('Error sending SMS:', error);
+      res.status(500).json({ success: false, error: 'Failed to send SMS' });
+    }
+  });
+
 
 
 

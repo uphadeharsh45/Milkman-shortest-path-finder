@@ -14,6 +14,7 @@ const locationSchema = new mongoose.Schema({
         required:true
     },
     time: String,
+    phoneNumber: String,
 });
 
 const routeSchema = new mongoose.Schema({
