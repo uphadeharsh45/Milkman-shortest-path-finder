@@ -8,6 +8,7 @@ import { useContext } from 'react';
 import routeContext from '../context/routes/routeContext';
 import DistanceMatrix from './DistanceMatrix';
 import LoadingBar from 'react-top-loading-bar';
+import return1 from './return.png'
 
 const libraries = ['places','directions'];
 const Showonmap = () => {
@@ -198,6 +199,7 @@ const Showonmap = () => {
 
     setDeadline(deadlines);
     document.getElementById('directionbox').style.visibility='visible';
+    document.getElementById('SMSbutton').style.visibility='visible';
     document.getElementById('customers').style.visibility='hidden';
     };
 
@@ -368,18 +370,33 @@ const Showonmap = () => {
         >
           {/* <Marker position={currentPosition} /> */}
           {clickedLatLng && <Marker position={clickedLatLng} />}
-          <button className="btn btn-danger"
+          <div className="return_box"
             style={{
               position: 'absolute',
-              top: '2vh',
-              left: '1vw',
-              zIndex: '9999'
+              bottom: '3vh',
+              right: '1vw',
+              zIndex: '9999',
+              backgroundColor:'black',
+              height:'7vh',
+              width:'7vh',
+              borderRadius:'30vh'
             }}
             onClick={() => {
               map.panTo(currentPosition);
             }}
           >
-            Return
+            <img src={return1} alt="return image" className="img-fluid mb-4" style={{padding:'1.3vh',height:'6vh',marginTop:'0.5vh'}}/>
+          </div>
+          <button className="btn btn-danger" id='SMSbutton'
+            style={{
+              position: 'absolute',
+              top: '2vh',
+              left: '1vw',
+              zIndex: '9999',
+              visibility:'hidden'
+            }}
+          >
+            Send SMS
           </button>
           <div className="container-fluid" id='customers'
             style={{

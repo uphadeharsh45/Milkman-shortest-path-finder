@@ -4,16 +4,17 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import routeContext from '../context/routes/routeContext';
+import logo from './map.png'
 
 
 const ShowRoute = (props) => {
 
   const navigate = useNavigate();
   const context = useContext(routeContext);
-  const { routes, getallroutes,updateRoute,deleteRoute,deleteCustomer,updateTime } = context;
-  const [routeIdtoUpdate,setRouteIdtoUpdate]=useState('');
-  const [custIdtoUpdate,setCustIdtoUpdate]=useState('');
-  const [newTime,setNewTime]=useState('');
+  const { routes, getallroutes, updateRoute, deleteRoute, deleteCustomer, updateTime } = context;
+  const [routeIdtoUpdate, setRouteIdtoUpdate] = useState('');
+  const [custIdtoUpdate, setCustIdtoUpdate] = useState('');
+  const [newTime, setNewTime] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,10 +42,10 @@ const ShowRoute = (props) => {
     navigate("/login");
   }
 
-  const handleEditCustomer=()=>{
-    updateTime(routeIdtoUpdate,custIdtoUpdate,newTime);
+  const handleEditCustomer = () => {
+    updateTime(routeIdtoUpdate, custIdtoUpdate, newTime);
     setNewTime('');
-    props.showAlert("Deadline updated successfully !","success")
+    props.showAlert("Deadline updated successfully !", "success")
   }
 
   // const showroute=(index)=>{
@@ -55,13 +56,14 @@ const ShowRoute = (props) => {
     navigate("/showonmap", { state: { id, locations } });
   }
 
-  
+
 
   return (
     <div>
       <div>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
+            <img src={logo} alt="Login Image" className="img-fluid mx-3" style={{height:'4vh'}}/>
             <Link className="navbar-brand" to="/">RouteMaster</Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span className="navbar-toggler-icon"></span>
@@ -111,7 +113,7 @@ const ShowRoute = (props) => {
                       backgroundColor: '#e4e4e4',
                       color: 'black',
                       cursor: 'pointer'
-                    }} value={newTime} onChange={(e) => setNewTime(e.target.value)}  />
+                    }} value={newTime} onChange={(e) => setNewTime(e.target.value)} />
                 </div>
               </form>
             </div>
@@ -122,11 +124,11 @@ const ShowRoute = (props) => {
           </div>
         </div>
       </div>
-      <h1 className='my-3'>Saved Routes</h1>
+      <h1 className='my-3' style={{ textShadow: '2px 2px #ff0000', color: 'white' }}>Saved Routes</h1>
       <div className="container" style={{ padding: '2vw' }}>
         {routes.map((index, arrayindex) => (
-          <div style={{padding:'1vw'}}>
-            <h3>{`Route ${arrayindex + 1}`}<i className="fa-solid fa-trash mx-5" onClick={()=>{deleteRoute(index._id);props.showAlert("Route deleted successfully !","success")}}></i><button className="btn btn-danger" type="submit" onClick={() => showroute(index._id, index.locations)}>Show Route</button></h3>
+          <div style={{ padding: '1vw', color: 'white' }}>
+            <h3>{`Route ${arrayindex + 1}`}<i className="fa-solid fa-trash mx-5" onClick={() => { deleteRoute(index._id); props.showAlert("Route deleted successfully !", "success") }}></i><button className="btn btn-danger" type="submit" onClick={() => showroute(index._id, index.locations)}>Show Route</button></h3>
             <table className='table table-bordered table-dark' id={index} >
               <thead>
                 <tr>
@@ -139,8 +141,8 @@ const ShowRoute = (props) => {
               {index.locations.map((place) => (
                 <tbody>
                   <tr>
-                    <td className='table-sm'><i className="fa-solid fa-trash mx-2" onClick={()=>{deleteCustomer(index._id,place._id);props.showAlert("Customer Deleted successfully !","success")}}></i></td>
-                    <td ><i className="fa-solid fa-pen mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onClick={()=>{setCustIdtoUpdate(place._id);setRouteIdtoUpdate(index._id)}} ></i></td>
+                    <td className='table-sm'><i className="fa-solid fa-trash mx-2" onClick={() => { deleteCustomer(index._id, place._id); props.showAlert("Customer Deleted successfully !", "success") }}></i></td>
+                    <td ><i className="fa-solid fa-pen mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal" onClick={() => { setCustIdtoUpdate(place._id); setRouteIdtoUpdate(index._id) }} ></i></td>
                     <td >{place.name}</td>
                     <td >{place.time}</td>
                   </tr>
