@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import login_img from './login.png'
+import logo from './map.png'
+import { ReactTyped } from 'react-typed';
 
 const Login = (props) => {
   document.body.style.backgroundColor='black';
@@ -37,7 +39,11 @@ const Login = (props) => {
 
   return (
     <>
-    <div className='d-flex justify-content-center' style={{marginTop:'20vh'}}>
+    <div className="d-flex" style={{alignItems:'center',marginLeft:'32vw'}}>
+    <img src={logo} alt="Login Image" className="img-fluid mb-4 mx-5 my-3" style={{height:'6.2vh'}} />
+    <div className="content" style={{color:'white',fontSize:'2vw',textShadow:'2px 2px #ff0000'}}><ReactTyped strings={["Welcome to RouteMaster"]} typeSpeed={100} showCursor={false}/></div>
+    </div>
+    <div className='d-flex justify-content-center' style={{marginTop:'19vh'}}>
     <div className="container mx-5 d-none d-md-block">
     <img src={login_img} alt="Login Image" className="img-fluid mb-4" />
     </div>

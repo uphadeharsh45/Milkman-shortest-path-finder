@@ -6,6 +6,8 @@ import Spinner from './Spinner';
 import DistanceMatrix from './DistanceMatrix';
 import LoadingBar from 'react-top-loading-bar';
 import { SMS } from './SMS';
+import return1 from './return.png'
+import logo from './map.png'
 
 const libraries = ['places','directions'];
 const Map = () => {
@@ -191,6 +193,7 @@ const Map = () => {
     setTestlocation(newlocations);
     // setcalculatebox(true);
     document.getElementById('directionbox').style.visibility='visible';
+    document.getElementById('SMSbutton').style.visibility='visible';
     document.getElementById('customers').style.visibility='hidden';
      // Calculate time difference for deadlines
   const currentDate = new Date();
@@ -324,6 +327,7 @@ const Map = () => {
       <div>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
+          <img src={logo} alt="Login Image" className="img-fluid mx-3" style={{height:'4vh'}}/>
             <Link className="navbar-brand" to="/">RouteMaster</Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span className="navbar-toggler-icon"></span>
@@ -355,12 +359,8 @@ const Map = () => {
                   </li>
 
                   <li className="nav-item mx-2">
-                    <button className='btn btn-danger mx-2' onClick={handleLogout}>Logout</button>
+                    <button className='btn btn-danger' onClick={handleLogout}>Logout</button>
                   </li>
-                  <li className="nav-item mx-2">
-                    <button className='btn btn-danger mx-2' onClick={sendSMS1}>SMS</button>
-                  </li>
-               
                 </ul>
               </form>
             </div>
@@ -435,18 +435,35 @@ const Map = () => {
         >
           {/* <Marker position={currentPosition} /> */}
           {clickedLatLng && <Marker position={clickedLatLng} />}
-          <button className="btn btn-danger"
+          {/* <img src={logo} alt="Login Image" className="img-fluid mb-4" /> */}
+          <div className="return_box"
             style={{
               position: 'absolute',
-              top: '2vh',
-              left: '1vw',
-              zIndex: '9999'
+              bottom: '3vh',
+              right: '1vw',
+              zIndex: '9999',
+              backgroundColor:'black',
+              height:'7vh',
+              width:'7vh',
+              borderRadius:'30vh'
             }}
             onClick={() => {
               map.panTo(currentPosition);
             }}
           >
-            Return
+            <img src={return1} alt="return image" className="img-fluid mb-4" style={{padding:'1.3vh',height:'6vh',marginTop:'0.5vh'}}/>
+          </div>
+          <button className="btn btn-danger" id='SMSbutton'
+            style={{
+              position: 'absolute',
+              top: '2vh',
+              left: '1vw',
+              zIndex: '9999',
+              visibility:'hidden'
+            }}
+            onClick={sendSMS1}
+          >
+            Send SMS
           </button>
           <div className="container-fluid" id='customers'
             style={{
@@ -469,7 +486,7 @@ const Map = () => {
                 fontWeight:'bold',
                 fontSize:fontSize
               }}>
-              <li className='nav-item'>Name</li>
+              <li className='nav-item' style={{marginLeft:'3vh'}}>Name</li>
               <li className='nav-item'>Time</li>
             </ul>
                 <div className="container mx-2">
@@ -487,7 +504,7 @@ const Map = () => {
                   padding: '0vh',
                   fontSize:fontSize
                 }}>
-                <li className='nav-item'>{place.name}</li>
+                <li className='nav-item'><i className="fa-solid fa-trash" style={{marginRight:'2vh'}}></i>{place.name}</li>
                 <li className='nav-item'>{place.time}</li>
               </ul>
               </>
