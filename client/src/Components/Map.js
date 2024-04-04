@@ -10,7 +10,7 @@ import return1 from './return.png'
 import logo from './map.png'
 
 const libraries = ['places','directions'];
-const Map = () => {
+const Map = (props) => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey:process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: libraries
@@ -285,11 +285,15 @@ const Map = () => {
     };
 
     const sendSMS1 = async () => {
+      props.showAlert("Sending SMS to customers !", "success")
+
       const deliveryTimes = [];
       if (directionsResponse && directionsResponse.routes && directionsResponse.routes.length > 0) {
         const route = directionsResponse.routes[0]; // Assuming there's only one route
+        let cumulativeDuration = 0;
         route.legs.forEach((leg, index) => {
-          const arrivalTime = new Date(Date.now() + leg.duration.value * 1000); // Convert duration to milliseconds
+          cumulativeDuration += leg.duration.value;
+          const arrivalTime = new Date(Date.now() + cumulativeDuration * 1000); // Convert duration to milliseconds
           deliveryTimes.push(arrivalTime);
         });
       }
@@ -309,6 +313,18 @@ const Map = () => {
         SMS(customer.phoneNumber, `Your delivery time is ${customer.deliveryTime}`);
       }
     }
+
+    const handleDeleteCustomer = (latToDelete, lngToDelete) => {
+      // Remove the customer from the places array
+      setPlaces(prevPlaces => prevPlaces.filter(place => place.lat !== latToDelete || place.lng !== lngToDelete));
+    
+      // Remove the corresponding marker from the markers array
+      setMarkers(prevMarkers => prevMarkers.filter(marker => marker.lat !== latToDelete || marker.lng !== lngToDelete))
+      // setMarkers([]);
+      console.log(markers);
+      props.showAlert("Customer removed successfully !", "success")
+      
+    };
     
 
     if (!isLoaded) {
@@ -504,7 +520,7 @@ const Map = () => {
                   padding: '0vh',
                   fontSize:fontSize
                 }}>
-                <li className='nav-item'><i className="fa-solid fa-trash" style={{marginRight:'2vh'}}></i>{place.name}</li>
+                <li className='nav-item'><i className="fa-solid fa-trash" style={{marginRight:'2vh'}}  onClick={() => handleDeleteCustomer(place.lat, place.lng)}></i>{place.name}</li>
                 <li className='nav-item'>{place.time}</li>
               </ul>
               </>
