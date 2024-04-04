@@ -8,6 +8,7 @@ import logo from './map.png'
 
 
 const ShowRoute = (props) => {
+  document.body.style.backgroundColor='black';
 
   const navigate = useNavigate();
   const context = useContext(routeContext);
