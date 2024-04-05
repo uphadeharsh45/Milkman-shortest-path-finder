@@ -10,6 +10,7 @@ import DistanceMatrix from './DistanceMatrix';
 import LoadingBar from 'react-top-loading-bar';
 import return1 from './return.png'
 import { SMS } from './SMS';
+import logo from './map.png'
 
 
 const libraries = ['places','directions'];
@@ -319,6 +320,7 @@ const Showonmap = (props) => {
       <div>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
+          <img src={logo} alt="Login Image" className="img-fluid mx-3" style={{height:'4vh'}}/>
             <Link className="navbar-brand" to="/">RouteMaster</Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span className="navbar-toggler-icon"></span>

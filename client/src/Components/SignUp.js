@@ -46,7 +46,7 @@ const SignUp = (props) => {
     <img src={logo} alt="Login Image" className="img-fluid mb-4 mx-5 my-3" style={{height:'6.2vh'}} />
     <div className="content" style={{color:'white',fontSize:'2vw',textShadow:'2px 2px #ff0000'}}><ReactTyped strings={["Welcome to RouteMaster"]} typeSpeed={100} showCursor={false}/></div>
     </div>
-      <div className='d-flex justify-content-center' style={{ marginTop: '13vh' }}>
+      <div className='d-flex justify-content-center' style={{ marginTop: '7%' }}>
         <div className="container mx-5 d-none d-md-block">
           <img src={signup_img} alt="Login Image" className="img-fluid mb-3" />
         </div>
