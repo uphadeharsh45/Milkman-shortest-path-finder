@@ -5,6 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from './Spinner';
 import LoadingBar from 'react-top-loading-bar';
 import { fetchOptimizedRoute } from './fetchOptimizedRoute';
+import return1 from './return.png'
+import { SMS } from './SMS';
+import logo from './map.png'
 
 const libraries = ['places','directions'];
 const RouteWithoutTime = () => {
@@ -198,6 +201,7 @@ const RouteWithoutTime = () => {
       }
 
     document.getElementById('directionbox').style.visibility='visible';
+    document.getElementById('SMSbutton').style.visibility='visible';
     document.getElementById('customers').style.visibility='hidden';
    await fetchOptimizedRoute(
         [
@@ -303,11 +307,13 @@ const RouteWithoutTime = () => {
       )
     }
 
+
   return (
     <>
       <div>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container-fluid">
+          <img src={logo} alt="Login Image" className="img-fluid mx-3" style={{height:'4vh'}}/>
             <Link className="navbar-brand" to="/">RouteMaster</Link>
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span className="navbar-toggler-icon"></span>
@@ -399,25 +405,40 @@ const RouteWithoutTime = () => {
         >
           {/* <Marker position={currentPosition} /> */}
           {clickedLatLng && <Marker position={clickedLatLng} />}
-          <button className="btn btn-danger"
+          <div className="return_box" id='return_box'
             style={{
               position: 'absolute',
-              top: '2vh',
-              left: '1vw',
-              zIndex: '9999'
+              bottom: '3vh',
+              right: '1vw',
+              zIndex: '9999',
+              backgroundColor:'black',
+              height:'7vh',
+              width:'7vh',
+              borderRadius:'30vh'
             }}
             onClick={() => {
               map.panTo(currentPosition);
             }}
           >
-            Return
+            <img src={return1} alt="return image" className="img-fluid mb-4" style={{padding:'1.3vh',height:'6vh',marginTop:'0.5vh'}}/>
+          </div>  
+          <button className="btn btn-danger" id='SMSbutton'
+            style={{
+              position: 'absolute',
+              top: '2vh',
+              left: '1vw',
+              zIndex: '9999',
+              visibility:'hidden'
+            }}
+          >
+            Send SMS
           </button>
           <div className="container-fluid" id='customers'
             style={{
               position: 'absolute',
               top: '10vh',
               left: '1vw',
-              width: '15vw',
+              width: '6vw',
               zIndex: '9999',
               backgroundColor: '#e4e4e4',
               padding: '10px',
@@ -431,12 +452,14 @@ const RouteWithoutTime = () => {
                 listStyle: 'none',
                 padding: '0.2vh',
                 fontWeight:'bold',
-                fontSize:fontSize
+                fontSize:fontSize,
+                display: 'flex',
+                justifyContent: 'center'
               }}>
               <li className='nav-item'>Name</li>
             </ul>
                 <div className="container mx-2">
-                  {places.length === 0 && 'No destinations to Display'}
+                  {places.length === 0 && 'Nothing to Display'}
                 </div>
             {places.map((place,index) => (
               <>
@@ -448,7 +471,9 @@ const RouteWithoutTime = () => {
                   flexWrap: 'wrap',
                   listStyle: 'none',
                   padding: '0vh',
-                  fontSize:fontSize
+                  fontSize:fontSize,
+                  display: 'flex',
+                  justifyContent: 'center'
                 }}>
                 <li className='nav-item'>{place.name}</li>
               </ul>
