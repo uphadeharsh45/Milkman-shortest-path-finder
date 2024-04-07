@@ -10,7 +10,7 @@ import { SMS } from './SMS';
 import logo from './map.png'
 
 const libraries = ['places','directions'];
-const RouteWithoutTime = () => {
+const RouteWithoutTime = (props) => {
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries: libraries
@@ -18,7 +18,7 @@ const RouteWithoutTime = () => {
   const [places, setPlaces] = useState([]);
   const [map, setmap] = useState(/** @type google.maps.Map */(null))
   const [searchPosition, setSearchPosition] = useState(null);
-  const [temp, settemp] = useState({ name: "", lat: "", lng: "" })
+  const [temp, settemp] = useState({ name: "", lat: "", lng: "" ,phoneNumber:""})
   const autocompleteRef = useRef(null);
   const [clickedLatLng, setClickedLatLng] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(null);
@@ -298,6 +298,66 @@ const RouteWithoutTime = () => {
       fetchDirections(formattedData);
     }, [formattedData]);
 
+    const handleDeleteCustomer = (latToDelete, lngToDelete) => {
+      // Remove the customer from the places array
+      setPlaces(prevPlaces => prevPlaces.filter(place => place.lat !== latToDelete || place.lng !== lngToDelete));
+    
+      // Remove the corresponding marker from the markers array
+      setMarkers(prevMarkers => prevMarkers.filter(marker => marker.lat !== latToDelete || marker.lng !== lngToDelete))
+      // setMarkers([]);
+      console.log(markers);
+      props.showAlert("Customer removed successfully !", "success")
+      
+    };
+
+
+    const matchPlacesWithOptimizedLocations = (optimizedLocations, places) => {
+      return optimizedLocations.map(optLocation => {
+        const matchedPlace = places.find(place => 
+          place.lat === optLocation.lat && place.lng === optLocation.lng
+        );
+        return {
+          ...optLocation,
+          name: matchedPlace ? matchedPlace.name : "Unknown",
+          phoneNumber:matchedPlace?'+91'+matchedPlace.phoneNumber:"Unknown" // Add customer name or use a default value
+          // Add other properties from matchedPlace as needed
+        };
+      });
+    };
+
+    const sendSMS1 = async () => {
+      props.showAlert("Sending SMS to customers !", "success")
+
+      const deliveryTimes = [];
+      if (directionsResponse && directionsResponse.routes && directionsResponse.routes.length > 0) {
+        const route = directionsResponse.routes[0]; // Assuming there's only one route
+        let cumulativeDuration = 0;
+        route.legs.forEach((leg, index) => {
+          cumulativeDuration += leg.duration.value;
+          const arrivalTime = new Date(Date.now() + cumulativeDuration * 1000); // Convert duration to milliseconds
+          deliveryTimes.push(arrivalTime);
+        });
+      }
+      console.log(formattedData);
+      let newARR=formattedData.waypoints;
+      newARR.push(formattedData.endLocation);
+      console.log(newARR);
+      const matchedPlaces = matchPlacesWithOptimizedLocations(newARR, places);
+    
+      // const oneThirdLength = Math.ceil(matchedPlaces.length / 3);
+      // const slicedArray = matchedPlaces.slice(0, oneThirdLength);
+      const SMSarray = matchedPlaces.map((place, index) => ({
+        ...place,
+        deliveryTime: deliveryTimes[index].toString(), // Assuming deliveryTimes and matchedPlaces are of the same length
+      }));
+    
+      // Iterate over SMSarray and send SMS for each customer using for...of loop
+      for (const customer of SMSarray) {
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for 3 seconds
+        SMS(customer.phoneNumber, `Your delivery time is ${customer.deliveryTime}`);
+      }
+    }
+
     if (!isLoaded) {
       return (
         <div className="container" style={{marginTop:'25%'}}>
@@ -368,6 +428,10 @@ const RouteWithoutTime = () => {
                   <label htmlFor="recipient-name" className="col-form-label">Name:</label>
                   <input type="text" className="form-control" id="recipient-name" style={{ backgroundColor: '#e4e4e4', border: '1px solid black' }} value={temp.name} onChange={(e) => settemp({ ...temp, name: e.target.value })} />
                 </div>
+                <div className="mb-3">
+                  <label htmlFor="recipient-number" className="col-form-label">Phone Number:</label>
+                  <input type="text" className="form-control" id="recipient-number" style={{ backgroundColor: '#e4e4e4', border: '1px solid black' }} value={temp.phoneNumber} onChange={(e) => settemp({ ...temp, phoneNumber: e.target.value })} />
+                </div>
                
               </form>
             </div>
@@ -429,7 +493,7 @@ const RouteWithoutTime = () => {
               left: '1vw',
               zIndex: '9999',
               visibility:'hidden'
-            }}
+            }} onClick={sendSMS1}
           >
             Send SMS
           </button>
@@ -475,8 +539,7 @@ const RouteWithoutTime = () => {
                   display: 'flex',
                   justifyContent: 'center'
                 }}>
-                <li className='nav-item'>{place.name}</li>
-              </ul>
+  <li className='nav-item'><i className="fa-solid fa-trash" style={{marginRight:'2vh'}}  onClick={() => handleDeleteCustomer(place.lat, place.lng)}></i>{place.name}</li>              </ul>
               </>
             ))}
           </div>
